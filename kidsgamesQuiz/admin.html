@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="inputs">
+      <section>
+        <h1>log in to send the questions</h1>
+        <button id="logBtn">log as admin</button>
+      </section>
+    </div>
+    <div class="hidden" id="admin-dashboard">
+      <section>
+        <div>
+          <h1>Question à envoyer :</h1>
+          <fieldset id="questions"></fieldset>
+          <button id="send-question">Send question</button>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="admin.js" defer></script>
+  </body>
+</html>

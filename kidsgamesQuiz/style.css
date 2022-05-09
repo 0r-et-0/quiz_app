@@ -1,0 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+}
+section {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+}
+
+#questions {
+  display: flex;
+  flex-direction: column;
+}
+
+#questions input[type="radio"],
+#answersBtn input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+#questions label,
+#answersBtn label {
+  display: inline-block;
+  padding: 10px 20px;
+  font-family: sans-serif, Arial;
+  font-size: 16px;
+  border: 2px solid #444;
+  border-radius: 999px;
+  margin: 0.5rem;
+}
+#questions label:hover,
+#answersBtn label:hover {
+  background-color: #dfd;
+}
+#questions input[type="radio"]:focus + label,
+#answersBtn input[type="radio"]:focus + label {
+  background-color: red;
+}
+#questions input[type="radio"]:checked + label,
+#answersBtn input[type="radio"]:checked + label {
+  background-color: #bfb;
+  border: 2px solid #4c4;
+}
+#inputs {
+  flex-direction: column;
+}
+.select-region {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.select-region select {
+  width: fit-content;
+  align-self: center;
+}
+h1 {
+  font-size: 2rem;
+}
+button {
+  padding: 0.5rem 2rem;
+  max-height: 3.5rem rem;
+  margin: 1rem;
+  font-size: 1rem;
+  background-color: black;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 999px;
+  border: none;
+  width: fit-content;
+  align-self: center;
+}
+.answerBtn {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+}
+
+fieldset {
+  border-radius: 16px;
+}
+.hidden {
+  display: none;
+}
+.flex {
+  display: flex;
+}
+span {
+  margin: 0.5rem;
+}
+.resultKey {
+  color: blue;
+}

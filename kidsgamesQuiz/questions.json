@@ -1,0 +1,15 @@
+[
+  {
+    "question": "Merci de patienter, le quiz va bientôt commencer !"
+  },
+  {
+    "question": "Depuis quand les kidsgames existent-ils ?",
+    "answers": ["10 ans", "5 ans", "20 ans", "12 ans"],
+    "trueAnswer": "20 ans"
+  },
+  {
+    "question": "Depuis la première édition des kidsgames, combien d'enfants ont participé ? ",
+    "answers": ["10'000", "20'000", "50'000"],
+    "trueAnswer": "20'000"
+  }
+]

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <section>
+      <div id="welcome">
+        <h2>Bienvenue sur le quiz des Kidsgames 2022 !</h2>
+        <p>
+          Dis nous dans quelle région tu es afin que tu puisse aider ta région à
+          gagner !
+        </p>
+        <div class="select-region">
+          <h3>Ta region</h3>
+          <select name="region" id="Region">
+            <option value="chablais">Chablais</option>
+            <option value="echallens">Echallens</option>
+            <option value="fribourg">Fribourg - La Gruyère</option>
+            <option value="jura">Jura bernois - Jura</option>
+            <option value="broye">La Broye</option>
+            <option value="cote">La Côte</option>
+            <option value="lausanne">Lausanne</option>
+            <option value="morges">Morges - Pied du Jura</option>
+            <option value="neuchatel_littoral">Neuchâtel - Littoral</option>
+            <option value="neuchatel_montagnes">Neuchâtel - Montagnes</option>
+            <option value="neuchatel_val_de_ruz">Neuchâtel - Val-de-Ruz</option>
+            <option value="neuchatel_val_de_ruz">
+              Neuchâtel - Val-de-Travers
+            </option>
+            <option value="orbe_chavornay">Orbe-Chavornay</option>
+            <option value="ouest_lausannois">Ouest-Lausannois</option>
+            <option value="palezieux">Palézieux</option>
+            <option value="riviera">Riviera</option>
+            <option value="valais">Valais</option>
+            <option value="yverdon">Yverdon-les-Bains</option>
+          </select>
+        </div>
+        <button id="sendRegion">Valider</button>
+      </div>
+      <div id="questions-to-show" class="hidden">
+        <h1 id="question-place">
+          Les différentes questions du quiz s'afficheront ici dès que le quiz
+          commencera
+        </h1>
+        <br />
+      </div>
+      <div id="inputs" class="hidden">
+        <div id="answersBtn"></div>
+      </div>
+    </section>
+
+    <script type="module" src="app.js" defer></script>
+  </body>
+</html>
