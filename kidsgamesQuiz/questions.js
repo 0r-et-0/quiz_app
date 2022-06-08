@@ -6,20 +6,31 @@ let questionsData = {
     id: "q0",
   },
   q1: {
-    question: "Depuis quand les kidsgames existent-ils ?",
+    question:
+      "Combien de régions et d’enfants ont participé à la 1ère édition en 2004 ?",
     id: "q1",
-    answers: ["10 ans", "5 ans", "20 ans", "12 ans"],
-    verifiedAnswer: "20 ans",
+    answers: [
+      "5 régions, 500 enfants",
+      "9 régions, 1450 enfants",
+      "15 régions, 1000 enfants",
+    ],
+    verifiedAnswer: "9 régions, 1450 enfants",
   },
   q2: {
-    question:
-      "Depuis la première édition des kidsgames, combien d'enfants ont participé ? ",
+    question: "Les 3 sports phares dans l’ordre avec ballons depuis 2004 ?",
     id: "q2",
-    answers: ["10'000", "20'000", "50'000"],
-    verifiedAnswer: "50'000",
+    answers: [
+      "Kinball, football, Tchoukball",
+      "Kinball, Poullball, basket",
+      "Tchoukball, Kinball, Poullball",
+    ],
+    verifiedAnswer: "Tchoukball, Kinball, Poullball",
   },
   q3: {
-    question: "Merci d'avoir participé !",
+    question:
+      "Où a eu lieu la dernière cérémonie d’ouverture romande en 2018 ?",
     id: "q3",
+    answers: ["Fribourg", "Bulle", "Neuchâtel"],
+    verifiedAnswer: "Bulle",
   },
 };
