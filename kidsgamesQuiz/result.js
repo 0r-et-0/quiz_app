@@ -1,6 +1,4 @@
 /* IMPORT AND CONFIG */
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
 import {
@@ -15,14 +13,11 @@ import {
   set,
   child,
   get,
+  onValue,
   update,
   remove,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyD3ccrB_rquaD6Fs6fgyuvt8W-lMCcBv_Q",
   authDomain: "kidsgames-quiz.firebaseapp.com",
@@ -35,19 +30,20 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getDatabase();
 const auth = getAuth(app);
-let USER, REGION;
 const provider = new GoogleAuthProvider();
+/* DOM */
 const getResultBtn = document.getElementById("getResultBtn");
-getResultBtn.addEventListener("click", getResult);
-const resultDiv = document.getElementById("showResults");
+getResultBtn.addEventListener("click", getUsersAnswers);
+const map = document.getElementById("map");
+const questionAnswered = document.getElementById("question");
 /* login */
 let loginBtn = document.getElementById("logBtn");
 loginBtn.addEventListener("click", signIn);
 
 let resultByRegion = {};
+let latestQuestion;
 
 /* Data from DB */
 let dataFromDB;
@@ -55,26 +51,18 @@ let dataFromDB;
 function signIn() {
   signInWithPopup(auth, provider)
     .then((result) => {
-      console.log(result);
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      console.log("login succed");
+      /* start listen to db changes */
+      onValue(ref(db, "questions"), (snapshot) => {
+        latestQuestion = snapshot.val();
+        questionAnswered.innerHTML = latestQuestion.question;
+        getUsersAnswers();
+      });
       setupDashboard();
-      // ...
     })
     .catch((error) => {
-      // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
       console.log(errorCode, errorMessage);
-      // ...
     });
 }
 
@@ -86,14 +74,13 @@ function setupDashboard() {
   resultSection.classList.remove("hidden");
 }
 
-function getResult() {
-  const dbref = ref(db);
-
-  get(child(dbref, "users"))
+function getUsersAnswers() {
+  get(child(ref(db), "users"))
     .then((snapshot) => {
       if (snapshot.exists()) {
-        /* console.log(snapshot.val()); */
         dataFromDB = snapshot.val();
+        console.log(dataFromDB);
+        console.log("nombre de users :" + Object.keys(dataFromDB).length);
         generateResults();
       } else {
         console.log("No data available");
@@ -106,49 +93,105 @@ function getResult() {
 
 function generateResults() {
   resultByRegion = {};
-  for (const [key, value] of Object.entries(dataFromDB)) {
-    let reg = value.region;
-    let ans = value.answer;
-    if (reg !== undefined && ans !== undefined) {
-      console.log(key);
-      if (resultByRegion.hasOwnProperty(reg)) {
-        if (resultByRegion[reg].hasOwnProperty(ans)) {
-          let count = resultByRegion[reg][ans];
-          resultByRegion[reg][ans] = count + 1;
-        } else {
-          resultByRegion[reg][ans] = 1;
+  for (const user in dataFromDB) {
+    let region = dataFromDB[user].region;
+    let questionAndAnswers = dataFromDB[user].answers;
+    if (region !== undefined || region !== null) {
+      if (!resultByRegion[region]) {
+        resultByRegion[region] = {};
+      }
+      if (questionAndAnswers !== undefined || region !== null) {
+        for (const question in questionAndAnswers) {
+          let answers = questionAndAnswers[question];
+          if (!resultByRegion[region][question]) {
+            resultByRegion[region][question] = {};
+          }
+          if (!resultByRegion[region][question][answers]) {
+            resultByRegion[region][question][answers] = 0;
+          }
+          resultByRegion[region][question][answers] += 1;
         }
       } else {
-        resultByRegion[reg] = {};
-        resultByRegion[reg][ans] = 1;
+        console.log("answer for user " + user + " is undefined !");
       }
+    } else {
+      console.log("region for user " + user + " is undefined !");
     }
   }
   console.log(resultByRegion);
-  showResuts();
+  verifyResults();
 }
 
-function showResuts() {
-  removeAllChildNodes(resultDiv);
-  for (const [regionKey, resultValue] of Object.entries(resultByRegion)) {
-    const regionDiv = document.createElement("div");
-    const regionTitle = document.createElement("h2");
-    regionTitle.innerHTML = regionKey;
-    regionDiv.appendChild(regionTitle);
-    resultDiv.appendChild(regionDiv);
-    for (const [key, value] of Object.entries(resultValue)) {
-      console.log(key, value);
-      const resultKey = document.createElement("span");
-      const resultVal = document.createElement("span");
-      const br = document.createElement("br");
-      resultKey.classList = "resultKey";
-      resultVal.classList = "resultVal";
-      resultKey.innerHTML = key;
-      resultVal.innerHTML = value;
-      regionDiv.appendChild(resultKey);
-      regionDiv.appendChild(resultVal);
-      regionDiv.appendChild(br);
+function verifyResults() {
+  const questionId = latestQuestion.id;
+  const possiblesAnswers = latestQuestion.answers;
+  const verifiedAnswer = latestQuestion.verifiedAnswer;
+
+  let regionFinalAnswers = {};
+  console.log(questionId, possiblesAnswers, verifiedAnswer);
+  /* check if it's a true question (not the starting sentence) */
+  if (possiblesAnswers) {
+    for (const region in resultByRegion) {
+      let AnswersForCurrentQuestion = resultByRegion[region][questionId];
+      let regionBiggestAnswer = { answer: "", count: 0 };
+      /* only if region has at least one response */
+      if (AnswersForCurrentQuestion) {
+        /* browse all answer and find the most answered answer for each region */
+        for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
+          /* if answer if most answered that the last we update */
+          if (value > regionBiggestAnswer.count) {
+            regionBiggestAnswer.answer = key;
+            regionBiggestAnswer.count = value;
+          } else if (value === regionBiggestAnswer.count) {
+            /* if we have a draw between two answer... */
+            console.log(
+              "%cit's a draw",
+              "color: white; font-style: italic; background-color: green;padding: 2px"
+            );
+            /* we will take the verified answer if possible */
+            if (key === verifiedAnswer) {
+              console.log("best answer is taken in the draw");
+              regionBiggestAnswer.answer = key;
+              regionBiggestAnswer.count = value;
+            }
+          }
+        }
+        console.log(
+          "%c" + region + "%c final answer is " + regionBiggestAnswer.answer,
+          "color: white; font-style: italic; background-color: green;padding: 2px"
+        );
+        console.log("detailed answers :");
+        console.log(AnswersForCurrentQuestion);
+        console.log("/////");
+        //check if answer region is true or false
+        if (regionBiggestAnswer.answer === verifiedAnswer) {
+          regionFinalAnswers[region] = true;
+        } else {
+          regionFinalAnswers[region] = false;
+        }
+      }
     }
+    console.log("final results for each region :");
+    console.log(regionFinalAnswers);
+
+    colorTheMap(regionFinalAnswers);
+  }
+  //color the map in grey here
+}
+// Returns a Promise that resolves after "ms" Milliseconds
+const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+
+async function colorTheMap(response) {
+  for (const region in response) {
+    const svgRegion = document.getElementById(region).firstElementChild;
+    if (svgRegion) {
+      if (response[region]) {
+        svgRegion.style.fill = "green";
+      } else {
+        svgRegion.style.fill = "red";
+      }
+    }
+    await timer(50);
   }
 }
 

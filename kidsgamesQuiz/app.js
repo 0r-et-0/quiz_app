@@ -2,7 +2,7 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+/* import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js"; */
 import {
   getAuth,
   signInAnonymously,
@@ -11,18 +11,12 @@ import {
 import {
   getDatabase,
   ref,
-  set,
   child,
   get,
   onValue,
   update,
-  remove,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyD3ccrB_rquaD6Fs6fgyuvt8W-lMCcBv_Q",
   authDomain: "kidsgames-quiz.firebaseapp.com",
@@ -35,132 +29,218 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+/* const analytics = getAnalytics(app); */
 const db = getDatabase();
-const auth = getAuth(app);
-let USER, REGION;
-
-/* SIGN IN */
-
-//TODO
-// check if user alerady add is region or not
-
-function signIn() {
-  signInAnonymously(auth)
-    .then(() => {
-      // Signed in..
-      console.log(USER);
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
-    });
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      USER = user.uid;
-      console.log(USER);
-    }
-  });
-}
 
 /* REFERENCE */
-let nameInput = document.getElementById("Name");
+const output = document.getElementById("question-place");
+const timerDiv = document.getElementById("timer");
+const answerBtn = document.getElementById("answersBtn");
+const timerSpan = document.getElementById("timer-span");
+const spinner = document.getElementById("spinner");
 let regionInput = document.getElementById("Region");
-let answerInput = document.getElementById("Answer");
-let welcome = document.getElementById("welcome");
+let region = document.getElementById("region");
 let questions = document.getElementById("questions-to-show");
 let inputs = document.getElementById("inputs");
-const output = document.getElementById("question-place");
-const answerBtn = document.getElementById("answersBtn");
-
 let SendRegionBtn = document.getElementById("sendRegion");
-
 SendRegionBtn.addEventListener("click", storeRegion);
 
-/* INSERT DATA */
+/* variables */
+let countDownInterval;
+let timeUntilEnd;
+let USER, REGION;
+const TOO_LATE = "TOO_LATE";
+const WAITING = "WAITING";
+const SUCCESS = "SUCCESS";
+const TOO_LATE_MESSAGE =
+  "Désolé mais tu n'as pas répondu assez vite, attends la prochaine question !";
+const CHOOSE_ANSWER_MESSAGE = "Choisis ta réponse";
+const WAITING_MESSAGE =
+  "Attendez sur cette page, la prochaine question va s'afficher ici";
+const SUCCESS_MESSAGE =
+  "Votre réponse a été envoyée avec succès, attendez la prochaine question";
 
-function storeRegion() {
-  REGION = regionInput.value;
-  showQuestions();
-}
+/* AUTH */
+const auth = getAuth();
 
-function showQuestions() {
-  welcome.classList.add("hidden");
-  questions.classList.remove("hidden");
-  inputs.classList.remove("hidden");
-  inputs.classList.add("flex");
-}
+signInAnonymously(auth)
+  .then(() => {
+    // Signed in..
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // ...
+    alert(errorCode, errorMessage);
+  });
 
-const starCountRef = ref(db, "questions");
-onValue(starCountRef, (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    revealQuestion(data);
+/* execute when user is sign in */
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const user = auth.currentUser;
+    USER = user.uid;
+    IsUserInDB();
+    /* start listen to db changes */
+    onValue(ref(db, "questions"), (snapshot) => {
+      console.log("getting data from firebase...");
+      if (snapshot.exists()) {
+        revealQuestion(snapshot.val());
+      }
+    });
+  } else {
+    // User is signed out
   }
 });
 
-function revealQuestion(data) {
-  removeAllChildNodes(answerBtn);
-  output.innerHTML = data.question;
-  let answersArray = data.answers;
-  /* if answers from db exist --> add a btn for each */
-  if (answersArray) {
-    const h3 = document.createElement("h3");
-    h3.innerHTML = "Choisissez votre réponse";
-    answerBtn.appendChild(h3);
-    let index = 0;
-    for (const answer of answersArray) {
-      index++;
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.id = "a" + index;
-      input.value = answer;
-      input.onclick = function () {
-        sendData(input.value);
-      };
-      const label = document.createElement("label");
-      label.setAttribute("for", "a" + index);
-      label.innerHTML = answer;
+function IsUserInDB() {
+  console.log("check if user is in db");
+  get(ref(db, "users/" + USER))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        console.log("user is already registered in db");
+        if (snapshot.val().region) {
+          REGION = snapshot.val().region;
+          showQuestions();
+        } else {
+          console.log("user already registered in db but has no region");
+          showRegion();
+        }
+      } else {
+        console.log("user is not already registered in db");
+        showRegion();
+      }
+      //clear spinner
+      spinner.classList.add("hidden");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
 
-      answerBtn.appendChild(input);
-      answerBtn.appendChild(label);
+/* INSERT DATA */
+function storeRegion() {
+  REGION = regionInput.value;
+  sendData({ region: REGION }, "");
+  showQuestions();
+}
+
+function showRegion() {
+  region.classList.remove("hidden");
+  region.classList.add("flex");
+}
+
+function showQuestions() {
+  region.classList.add("hidden");
+  region.classList.remove("flex");
+  questions.classList.remove("hidden");
+  inputs.classList.remove("hidden");
+  inputs.classList.add("flex");
+  timerDiv.classList.remove("hidden");
+}
+
+function revealQuestion(data) {
+  /* delete all answer button if they exists on the DOM */
+  clear();
+  /* removeAllChildNodes(answerBtn); */
+  output.innerHTML = data.question;
+  /* parse data received form db */
+  let questionId = data.id;
+  let answersArray = data.answers;
+  let timer = data.timer;
+  /* delete existing interval if exists */
+  if (countDownInterval) {
+    clearInterval(countDownInterval);
+  }
+  /* check if timer exist */
+  if (timer && typeof timer === "number") {
+    console.log(timer);
+    let now = Date.now();
+    timeUntilEnd = Math.round((timer - now) / 1000);
+    if (timeUntilEnd > 0 && answersArray) {
+      timerDiv.classList.remove("hidden");
+      countDownInterval = setIntervalAndExecute(updateCountDown, 1000);
+      const h3 = document.createElement("h3");
+      h3.innerHTML = CHOOSE_ANSWER_MESSAGE;
+      answerBtn.appendChild(h3);
+      let index = 0;
+      for (const answer of answersArray) {
+        index++;
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.id = "a" + index;
+        input.value = answer;
+        // function call when user click on answer btn
+        input.addEventListener(
+          "click",
+          () => sendAnswer(answer, questionId),
+          false
+        );
+        const label = document.createElement("label");
+        label.setAttribute("for", "a" + index);
+        label.innerHTML = answer;
+        answerBtn.appendChild(input);
+        answerBtn.appendChild(label);
+      }
+    } else {
+      clear();
+      showMessage(TOO_LATE);
     }
+  } else {
+    clear();
+    showMessage(WAITING);
   }
 }
 
-function sendData(dataToSend) {
-  set(ref(db, "users/" + USER), {
-    region: REGION,
-    answer: dataToSend,
-  })
+function clear() {
+  removeAllChildNodes(answerBtn);
+  timerDiv.classList.add("hidden");
+  spinner.classList.add("hidden");
+}
+
+function showMessage(status) {
+  const messageToUser = document.createElement("span");
+  let message;
+  if (status === SUCCESS) {
+    messageToUser.classList.add("success");
+    message = SUCCESS_MESSAGE;
+  } else if (status === TOO_LATE) {
+    messageToUser.classList.add("fail");
+    message = TOO_LATE_MESSAGE;
+  } else {
+    messageToUser.classList.add("waiting");
+    message = WAITING_MESSAGE;
+  }
+  messageToUser.innerHTML = message;
+  answerBtn.appendChild(messageToUser);
+  spinner.classList.remove("hidden");
+}
+
+function sendAnswer(answer, id) {
+  clearInterval(countDownInterval);
+  let dataToSend = { [id]: answer };
+  sendData(dataToSend, "/answers");
+  clear();
+  showMessage(SUCCESS);
+}
+
+function sendData(dataToSend, path) {
+  /* update data with new one if already exist or create new if not */
+  update(ref(db, "users/" + USER + path), dataToSend)
     .then(() => {
-      alert("data send successfully");
-      removeAllChildNodes(answerBtn);
-      const succedMessage = document.createElement("span");
-      succedMessage.innerHTML =
-        "Votre réponse a été envoyée, attendez la prochaine question";
-      answerBtn.appendChild(succedMessage);
+      /* data has been send */
+      console.log("data sended");
     })
     .catch((error) => {
       alert("error: " + error);
     });
 }
 
-function removeAllChildNodes(parent) {
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-}
 /* function getData() {
-  const dbref = ref(db);
-
-  get(child(dbref, "users"))
+  get(child(ref(db), "questions"))
     .then((snapshot) => {
       if (snapshot.exists()) {
         console.log(snapshot.val());
+        revealQuestion(snapshot.val());
       } else {
         console.log("No data available");
       }
@@ -170,5 +250,32 @@ function removeAllChildNodes(parent) {
     });
 } */
 
-//run script
-window.onload = signIn();
+function updateCountDown() {
+  console.log("update countdown");
+  timerSpan.innerHTML = secondsToMin(timeUntilEnd);
+  if (timeUntilEnd > 0) {
+    // so it doesn't go to -1
+    timeUntilEnd--;
+  } else {
+    clearInterval(countDownInterval);
+    clear();
+    showMessage(TOO_LATE);
+  }
+}
+
+/* UTILS */
+
+function secondsToMin(s) {
+  return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
+}
+
+function setIntervalAndExecute(fn, t) {
+  fn();
+  return setInterval(fn, t);
+}
+
+function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}

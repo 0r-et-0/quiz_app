@@ -1,0 +1,298 @@
+{
+  "questions": {
+    "answers": ["10'000", "20'000", "50'000"],
+    "id": "q2",
+    "question": "Depuis la première édition des kidsgames, combien d'enfants ont participé ? ",
+    "timer": 1654686875671,
+    "verifiedAnswer": "50'000"
+  },
+  "users": {
+    "14bU59CypzcCSymwzfvnz3Tt7pA3": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "10'000"
+      },
+      "region": "valais"
+    },
+    "2TH7opapLtO0nscSwFrfOLaoT283": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "cote"
+    },
+    "4MOlB1HOHqM5ncGj73Vc643QI2U2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "morges"
+    },
+    "7ciPRAwskBfmNtHSOKXt6fohsVy1": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "8LdUH9egj0Q1URyW2HqgwSQnnum2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "chablais"
+    },
+    "8chhfF0eSPemz1pIT9oX6BC8vaJ3": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "cote"
+    },
+    "8iFUWeDGZwa9Z6ImkThtFUrXV2l1": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "9w9vno8ozPcU2f47NrFByZXJhDJ2": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "50'000"
+      },
+      "region": "jura"
+    },
+    "9xsdib7djSYwp31buwMTlvwcZSG3": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "morges"
+    },
+    "AgCrrlujb1OXyopywUjHLMzxSXx1": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "chablais"
+    },
+    "BKgRbVMC3rayEqHxqweRUj2WOXn2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "10'000"
+      },
+      "region": "neuchatel_montagnes"
+    },
+    "CO50QoTbX4RIHOa2DktLrAi2gsD3": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "10'000"
+      },
+      "region": "fribourg"
+    },
+    "Dp4OK97mAFVz2bmdp5mDTFT2qw12": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "20'000"
+      },
+      "region": "broye"
+    },
+    "EzueCGk9AJZSHv1VZIiY0BvVr7e2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "JaBmKFdqTxObRCyad6fDBFfkuxg2": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "20'000"
+      },
+      "region": "neuchatel_littoral"
+    },
+    "KKfOxRQGezR8Pq2BLgEGL0J3fev2": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "10'000"
+      },
+      "region": "cote"
+    },
+    "LZbfEDfl8jfCG1NPLER08v8NJH02": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "10'000"
+      },
+      "region": "chablais"
+    },
+    "Meo81JJxaWVp14xk28Y228yshAv2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "Nf8gmDlLSmQ3KwwDf3Nstdlxeto2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "PQBYEwI9L4S5g2SQVuRdYP9mXrG3": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "10'000"
+      },
+      "region": "fribourg"
+    },
+    "PgayqBrfrfZjWEgykkNFOiKL8Q33": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "R28qtlXVUwTTYCHCMdpLi5LJvOO2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "SagDEAM1XgTMTlH2bJnNYtZKVLM2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "lausanne"
+    },
+    "T7YmSWPn1jWfRBmjVzpbM9Zqdvp2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "fribourg"
+    },
+    "TpS60KZZOicxueCeoJwVPG7LJt42": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "lausanne"
+    },
+    "UAuQOtTmwDYd48Pf7CYcFBI9ZSh2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "VCdwtsEa6qZ5UMYnMmnWo27Yvfc2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "VDF4Yyvssvhhx4zWDsMrgSlPwyF2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "cote"
+    },
+    "YVId0hUqujdMyJuYJvk3hQ89rTH3": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "20'000"
+      },
+      "region": "lausanne"
+    },
+    "Yo20wXSNz9gBHXvfgIlmi15HGki2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "neuchatel_littoral"
+    },
+    "ZNhUhom1TSOnzNz25hBQnGjfEh42": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "broye"
+    },
+    "bknWwr9lzMP04YQfcMqsdRS5sck1": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "lausanne"
+    },
+    "f3fd9xA4PIUNGXqb5VamBJgBanH3": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "20'000"
+      },
+      "region": "broye"
+    },
+    "fprJoMRPlGMjWKSPJnBMWBFMLGI2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "20'000"
+      },
+      "region": "neuchatel_littoral"
+    },
+    "kQeO3H5izgWMpbgz6RazBdwvdTW2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "chablais"
+    },
+    "kdVzNz8BWtgCuCq3fmgsWbmgj2i1": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "50'000"
+      },
+      "region": "neuchatel_littoral"
+    },
+    "lkoaihs3mTZyXP4Fl62OkceYOQz1": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    },
+    "n8J6llHt2wUzFyFU1aEoooa79Px2": {
+      "answers": {
+        "q1": "10 ans",
+        "q2": "20'000"
+      },
+      "region": "cote"
+    },
+    "r0fdpHcFhpT8f7QXj8TMAFzbnub2": {
+      "answers": {
+        "q1": "5 ans",
+        "q2": "50'000"
+      },
+      "region": "chablais"
+    },
+    "t3wKInsgrIPR9pAE3I3ydzkO2MJ3": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "20'000"
+      },
+      "region": "morges"
+    },
+    "xEtiVMYCPFR8yfhTSvhNJE8Pw8f1": {
+      "answers": {
+        "q1": "20 ans",
+        "q2": "20'000"
+      },
+      "region": "chablais"
+    }
+  }
+}

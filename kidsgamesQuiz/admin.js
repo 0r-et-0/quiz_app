@@ -1,6 +1,4 @@
 /* IMPORT AND CONFIG */
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
 import {
@@ -13,16 +11,8 @@ import {
   getDatabase,
   ref,
   set,
-  child,
-  get,
-  update,
-  remove,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyD3ccrB_rquaD6Fs6fgyuvt8W-lMCcBv_Q",
   authDomain: "kidsgames-quiz.firebaseapp.com",
@@ -35,23 +25,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getDatabase();
 const auth = getAuth(app);
+const TIMER = 60000;
+let countDownInterval;
+const timerSpan = document.getElementById("timer-span");
+let timeUntilEnd;
 
-onAuthStateChanged(auth, (user) => {
+/* onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("signed in");
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
     const uid = user.uid;
-    // ...
   } else {
     console.log("signed out");
-    // User is signed out
-    // ...
   }
-});
+}); */
 
 let USER, REGION;
 const provider = new GoogleAuthProvider();
@@ -65,77 +53,59 @@ sendBtn.addEventListener("click", () => {
   let radioButtons = document.querySelectorAll('input[name="question"]');
   for (let i = 0; i < radioButtons.length; i++) {
     if (radioButtons[i].checked) {
-      selectedQuestion = i;
+      selectedQuestion = radioButtons[i].id;
       break;
     }
   }
-  cleanAnswers();
+  sendQuestion();
+  /* cleanAnswers(); */
 });
 
 /* login */
 let loginBtn = document.getElementById("logBtn");
 loginBtn.addEventListener("click", signIn);
 
-function fetchQuestions() {
-  /* generer les questions depuis le fichier json */
-  fetch("./questions.json")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      questionFromJson = data;
-      console.log(questionFromJson);
-      createQuestions();
-    });
-}
-
 function createQuestions() {
   const fieldset = document.getElementById("questions");
-  let index = 0;
-  for (const question of questionFromJson) {
-    index += 1;
-    /*     const div = document.createElement("div"); */
+  console.log(questionsData);
+  for (const question in questionsData) {
+    console.log(question);
     const input = document.createElement("input");
-    input.id = "q" + index;
+    input.id = question;
     input.type = "radio";
     input.name = "question";
-    input.value = question.question;
+    input.value = questionsData[question].question;
     const label = document.createElement("label");
-    label.setAttribute("for", "q" + index);
-    label.innerHTML = question.question;
+    label.setAttribute("for", question);
+    label.innerHTML = questionsData[question].question;
 
     fieldset.appendChild(input);
     fieldset.appendChild(label);
-    /* 
-    fieldset.appendChild(div); */
   }
 }
 
 function sendQuestion() {
+  console.log(questionsData[selectedQuestion]);
+
+  timeUntilEnd = Math.round(TIMER / 1000);
+  let currentQuestion = questionsData[selectedQuestion];
+
   set(ref(db, "questions"), {
-    end_time: "1min",
-    question: questionFromJson[selectedQuestion].question,
-    answers: questionFromJson[selectedQuestion].answers
-      ? questionFromJson[selectedQuestion].answers
-      : null,
+    question: currentQuestion.question,
+    id: currentQuestion.id,
+    timer: currentQuestion.answers ? Date.now() + TIMER : null,
+    answers: currentQuestion.answers || null,
+    verifiedAnswer: currentQuestion.verifiedAnswer || null,
   })
     .then(() => {
-      alert("question envoyée avec succès");
+      /* alert("question envoyée avec succès"); */
+      clearInterval(countDownInterval);
+      if (selectedQuestion !== 0) {
+        countDownInterval = setIntervalAndExecute(updateCountDown, 1000);
+      }
     })
     .catch((error) => {
-      console.log(USER);
-      alert("error: " + error + "\n" + USER);
-    });
-}
-
-function cleanAnswers() {
-  remove(ref(db, "users/"))
-    .then(() => {
-      sendQuestion();
-    })
-    .catch((error) => {
-      console.log(USER);
-      alert("error: " + error + "\n" + USER);
+      alert("error: " + error);
     });
 }
 
@@ -148,7 +118,8 @@ function signIn() {
       // The signed-in user info.
       USER = result.user;
       console.log("login succed");
-      setupDashboard();
+      removeLoginBtn();
+      createQuestions();
       // ...
     })
     .catch((error) => {
@@ -164,7 +135,7 @@ function signIn() {
     });
 }
 
-function setupDashboard() {
+function removeLoginBtn() {
   /* remove login btn */
   const loginBtn = document.getElementById("inputs");
   loginBtn.classList.add("hidden");
@@ -172,4 +143,23 @@ function setupDashboard() {
   adminDash.classList.remove("hidden");
 }
 
-window.onload = fetchQuestions();
+function updateCountDown() {
+  timerSpan.innerHTML = secondsToMin(timeUntilEnd);
+  if (timeUntilEnd > 0) {
+    // so it doesn't go to -1
+    timeUntilEnd--;
+  } else {
+    clearInterval(countDownInterval);
+  }
+}
+
+/* UTILS */
+
+function secondsToMin(s) {
+  return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
+}
+
+function setIntervalAndExecute(fn, t) {
+  fn();
+  return setInterval(fn, t);
+}

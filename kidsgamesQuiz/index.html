@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js" defer></script>
   </head>
 
   <body>
     <section>
-      <div id="welcome">
-        <h2>Bienvenue sur le quiz des Kidsgames 2022 !</h2>
+      <h4>Quiz Kidsgames 2022</h4>
+
+      <div id="region" class="hidden">
         <p>
           Dis nous dans quelle région tu es afin que tu puisse aider ta région à
           gagner !
@@ -30,7 +32,7 @@
             <option value="neuchatel_littoral">Neuchâtel - Littoral</option>
             <option value="neuchatel_montagnes">Neuchâtel - Montagnes</option>
             <option value="neuchatel_val_de_ruz">Neuchâtel - Val-de-Ruz</option>
-            <option value="neuchatel_val_de_ruz">
+            <option value="neuchatel_val_de_travers">
               Neuchâtel - Val-de-Travers
             </option>
             <option value="orbe_chavornay">Orbe-Chavornay</option>
@@ -44,17 +46,23 @@
         <button id="sendRegion">Valider</button>
       </div>
       <div id="questions-to-show" class="hidden">
-        <h1 id="question-place">
-          Les différentes questions du quiz s'afficheront ici dès que le quiz
-          commencera
-        </h1>
-        <br />
+        <h1 id="question-place"></h1>
+      </div>
+      <div id="timer" class="hidden">
+        <h1 id="timer-span"></h1>
       </div>
       <div id="inputs" class="hidden">
         <div id="answersBtn"></div>
       </div>
-    </section>
 
-    <script type="module" src="app.js" defer></script>
+      <div id="spinner">
+        <div class="lds-ellipsis">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </section>
   </body>
 </html>
