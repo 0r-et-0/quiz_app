@@ -27,7 +27,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
-const TIMER = 60000;
+const TIMER = 30000;
 let countDownInterval;
 const timerSpan = document.getElementById("timer-span");
 let timeUntilEnd;
