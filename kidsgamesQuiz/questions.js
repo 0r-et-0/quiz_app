@@ -6,31 +6,38 @@ let questionsData = {
     id: "q0",
   },
   q1: {
-    question:
-      "Combien de régions et d’enfants ont participé à la 1ère édition en 2004 ?",
+    question: "Combien de régions participent aux KidsGames 2022 ?",
     id: "q1",
-    answers: [
-      "5 régions, 500 enfants",
-      "9 régions, 1450 enfants",
-      "15 régions, 1000 enfants",
-    ],
-    verifiedAnswer: "9 régions, 1450 enfants",
+    answers: ["16", "18", "19"],
+    verifiedAnswer: "18",
   },
   q2: {
-    question: "Les 3 sports phares dans l’ordre avec ballons depuis 2004 ?",
+    question: "Quel grand événement se déroule à Yverdon ce week-end ?",
     id: "q2",
     answers: [
-      "Kinball, football, Tchoukball",
-      "Kinball, Poullball, basket",
-      "Tchoukball, Kinball, Poullball",
+      "Championnat de gym",
+      "Fête régionale de Gym",
+      "Fête Cantonale de Gym",
     ],
-    verifiedAnswer: "Tchoukball, Kinball, Poullball",
+    verifiedAnswer: "Fête Cantonale de Gym",
   },
   q3: {
-    question:
-      "Où a eu lieu la dernière cérémonie d’ouverture romande en 2018 ?",
+    question: "Nom de l’église où nous nous trouvons ?",
     id: "q3",
-    answers: ["Fribourg", "Bulle", "Neuchâtel"],
-    verifiedAnswer: "Bulle",
+    answers: ["L’Escalade", "l’Escal", "la Passerelle"],
+    verifiedAnswer: "l’Escal",
+  },
+  q4: {
+    question:
+      " Combien de piquets (rouge et bleu) sont utilisé pour la cours’agile ?",
+    id: "q4",
+    answers: ["10", "8", "12"],
+    verifiedAnswer: "10",
+  },
+  q5: {
+    question: "Prêts à découvrir l’hymne KidsGames 2022 ?",
+    id: "q5",
+    answers: ["Oui", "Non", "Peut-être"],
+    verifiedAnswer: "Oui",
   },
 };
