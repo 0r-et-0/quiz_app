@@ -34,8 +34,6 @@ const db = getDatabase();
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 /* DOM */
-const getResultBtn = document.getElementById("getResultBtn");
-getResultBtn.addEventListener("click", getUsersAnswers);
 const map = document.getElementById("map");
 const questionAnswered = document.getElementById("question");
 /* login */
@@ -44,6 +42,27 @@ loginBtn.addEventListener("click", signIn);
 
 let resultByRegion = {};
 let latestQuestion;
+let checkForResultsInterval;
+let allRegions = [
+  "lausanne",
+  "cote",
+  "palezieux",
+  "riviera",
+  "neuchatel_val_de_ruz",
+  "neuchatel_val_de_travers",
+  "chablais",
+  "valais",
+  "morges",
+  "echallens",
+  "fribourg",
+  "ouest_lausannois",
+  "orbe_chavornay",
+  "neuchatel_montagnes",
+  "neuchatel_littoral",
+  "broye",
+  "jura",
+  "yverdon",
+];
 
 /* Data from DB */
 let dataFromDB;
@@ -55,7 +74,9 @@ function signIn() {
       onValue(ref(db, "questions"), (snapshot) => {
         latestQuestion = snapshot.val();
         questionAnswered.innerHTML = latestQuestion.question;
-        getUsersAnswers();
+        clearInterval(checkForResultsInterval);
+        resetMapColor();
+        checkForResultsInterval = setIntervalAndExecute(getUsersAnswers, 5000);
       });
       setupDashboard();
     })
@@ -75,34 +96,46 @@ function setupDashboard() {
 }
 
 function getUsersAnswers() {
-  get(child(ref(db), "users"))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        dataFromDB = snapshot.val();
-        console.log(dataFromDB);
-        console.log("nombre de users :" + Object.keys(dataFromDB).length);
-        generateResults();
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  if (
+    latestQuestion.verifiedAnswer !== undefined &&
+    latestQuestion.answers !== undefined &&
+    latestQuestion.timer !== undefined
+  ) {
+    get(child(ref(db), "users"))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          dataFromDB = snapshot.val();
+          let numbOfUsers = Object.keys(dataFromDB).length;
+          document.getElementById("numbersOfUser").innerHTML =
+            "nombre de participants: " + numbOfUsers;
+          generateResults();
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    clearInterval(checkForResultsInterval);
+    console.log("pas de question");
+    resetMapColor();
+  }
 }
 
 function generateResults() {
   resultByRegion = {};
   for (const user in dataFromDB) {
     let region = dataFromDB[user].region;
-    let questionAndAnswers = dataFromDB[user].answers;
-    if (region !== undefined || region !== null) {
+    let userAnswers = dataFromDB[user].answers;
+    if (region !== undefined && region !== null) {
       if (!resultByRegion[region]) {
         resultByRegion[region] = {};
       }
-      if (questionAndAnswers !== undefined || region !== null) {
-        for (const question in questionAndAnswers) {
-          let answers = questionAndAnswers[question];
+
+      if (userAnswers !== undefined && userAnswers !== null) {
+        for (const question in userAnswers) {
+          let answers = userAnswers[question];
           if (!resultByRegion[region][question]) {
             resultByRegion[region][question] = {};
           }
@@ -123,12 +156,22 @@ function generateResults() {
 }
 
 function verifyResults() {
+  /* always check for last question */
+  const questionTxt = latestQuestion.question;
   const questionId = latestQuestion.id;
   const possiblesAnswers = latestQuestion.answers;
   const verifiedAnswer = latestQuestion.verifiedAnswer;
 
   let regionFinalAnswers = {};
-  console.log(questionId, possiblesAnswers, verifiedAnswer);
+
+  console.log(
+    "%cla question posée est : " + questionTxt,
+    "color: white; font-style: italic; background-color: blue;padding: 2px"
+  );
+  console.log(
+    "%cla bonne réponse est : " + verifiedAnswer,
+    "color: white; font-style: italic; background-color: green;padding: 2px"
+  );
   /* check if it's a true question (not the starting sentence) */
   if (possiblesAnswers) {
     for (const region in resultByRegion) {
@@ -144,25 +187,27 @@ function verifyResults() {
             regionBiggestAnswer.count = value;
           } else if (value === regionBiggestAnswer.count) {
             /* if we have a draw between two answer... */
-            console.log(
+            /*             console.log(
               "%cit's a draw",
               "color: white; font-style: italic; background-color: green;padding: 2px"
-            );
+            ); */
             /* we will take the verified answer if possible */
             if (key === verifiedAnswer) {
-              console.log("best answer is taken in the draw");
+              /* console.log("best answer is taken in the draw"); */
               regionBiggestAnswer.answer = key;
               regionBiggestAnswer.count = value;
             }
           }
         }
-        console.log(
+        /*         console.log(
           "%c" + region + "%c final answer is " + regionBiggestAnswer.answer,
           "color: white; font-style: italic; background-color: green;padding: 2px"
-        );
+        ); 
         console.log("detailed answers :");
         console.log(AnswersForCurrentQuestion);
         console.log("/////");
+        */
+
         //check if answer region is true or false
         if (regionBiggestAnswer.answer === verifiedAnswer) {
           regionFinalAnswers[region] = true;
@@ -171,27 +216,44 @@ function verifyResults() {
         }
       }
     }
-    console.log("final results for each region :");
-    console.log(regionFinalAnswers);
+    for (const reg of allRegions) {
+      if (!(reg in regionFinalAnswers)) {
+        regionFinalAnswers[reg] = null;
+      }
+    }
+    console.log("Réponse des régions");
+    console.table(regionFinalAnswers);
 
     colorTheMap(regionFinalAnswers);
+  } else {
+    console.log("ce n'est pas la question");
   }
   //color the map in grey here
 }
-// Returns a Promise that resolves after "ms" Milliseconds
-const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 
 async function colorTheMap(response) {
   for (const region in response) {
     const svgRegion = document.getElementById(region).firstElementChild;
     if (svgRegion) {
       if (response[region]) {
-        svgRegion.style.fill = "green";
+        svgRegion.style.fill = "#a2c61c";
+      } else if (response[region] === false) {
+        svgRegion.style.fill = "#e10f21";
       } else {
-        svgRegion.style.fill = "red";
+        svgRegion.style.fill = "#EDEDED";
       }
     }
+    /* fake a delay when painting the regions */
     await timer(50);
+  }
+}
+
+function resetMapColor() {
+  for (const region in resultByRegion) {
+    const svgRegion = document.getElementById(region).firstElementChild;
+    if (svgRegion) {
+      svgRegion.style.fill = "#EDEDED";
+    }
   }
 }
 
@@ -200,3 +262,11 @@ function removeAllChildNodes(parent) {
     parent.removeChild(parent.firstChild);
   }
 }
+
+function setIntervalAndExecute(fn, t) {
+  fn();
+  return setInterval(fn, t);
+}
+
+// Returns a Promise that resolves after "ms" Milliseconds
+const timer = (ms) => new Promise((res) => setTimeout(res, ms));
