@@ -1,11 +1,9 @@
 /* IMPORT AND CONFIG */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import {
   getDatabase,
@@ -41,16 +39,14 @@ let timeUntilEnd;
   }
 }); */
 
-let USER, REGION;
 const provider = new GoogleAuthProvider();
 /* global */
 let selectedQuestion;
-let questionFromJson;
-var sendBtn = document.getElementById("send-question");
+const sendBtn = document.getElementById("send-question");
 
 /* event listener */
 sendBtn.addEventListener("click", () => {
-  let radioButtons = document.querySelectorAll('input[name="question"]');
+  const radioButtons = document.querySelectorAll("input[name='question']");
   for (let i = 0; i < radioButtons.length; i++) {
     if (radioButtons[i].checked) {
       selectedQuestion = radioButtons[i].id;
@@ -62,7 +58,7 @@ sendBtn.addEventListener("click", () => {
 });
 
 /* login */
-let loginBtn = document.getElementById("logBtn");
+const loginBtn = document.getElementById("logBtn");
 loginBtn.addEventListener("click", signIn);
 
 function createQuestions() {
@@ -88,7 +84,7 @@ function sendQuestion() {
   console.log(questionsData[selectedQuestion]);
 
   timeUntilEnd = Math.round(TIMER / 1000);
-  let currentQuestion = questionsData[selectedQuestion];
+  const currentQuestion = questionsData[selectedQuestion];
 
   set(ref(db, "questions"), {
     question: currentQuestion.question,
@@ -112,11 +108,7 @@ function sendQuestion() {
 function signIn() {
   signInWithPopup(auth, provider)
     .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
       // The signed-in user info.
-      USER = result.user;
       console.log("login succed");
       removeLoginBtn();
       createQuestions();
@@ -126,12 +118,7 @@ function signIn() {
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
       console.log(errorCode, errorMessage);
-      // ...
     });
 }
 

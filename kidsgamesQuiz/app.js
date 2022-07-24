@@ -11,7 +11,6 @@ import {
 import {
   getDatabase,
   ref,
-  child,
   get,
   onValue,
   update,
@@ -38,11 +37,11 @@ const timerDiv = document.getElementById("timer");
 const answerBtn = document.getElementById("answersBtn");
 const timerSpan = document.getElementById("timer-span");
 const spinner = document.getElementById("spinner");
-let regionInput = document.getElementById("Region");
-let region = document.getElementById("region");
-let questions = document.getElementById("questions-to-show");
-let inputs = document.getElementById("inputs");
-let SendRegionBtn = document.getElementById("sendRegion");
+const regionInput = document.getElementById("Region");
+const region = document.getElementById("region");
+const questions = document.getElementById("questions-to-show");
+const inputs = document.getElementById("inputs");
+const SendRegionBtn = document.getElementById("sendRegion");
 SendRegionBtn.addEventListener("click", storeRegion);
 
 /* variables */
@@ -144,9 +143,9 @@ function revealQuestion(data) {
   /* removeAllChildNodes(answerBtn); */
   output.innerHTML = data.question;
   /* parse data received form db */
-  let questionId = data.id;
-  let answersArray = data.answers;
-  let timer = data.timer;
+  const questionId = data.id;
+  const answersArray = data.answers;
+  const timer = data.timer;
   /* delete existing interval if exists */
   if (countDownInterval) {
     clearInterval(countDownInterval);
@@ -154,7 +153,7 @@ function revealQuestion(data) {
   /* check if timer exist */
   if (timer && typeof timer === "number") {
     console.log(timer);
-    let now = Date.now();
+    const now = Date.now();
     timeUntilEnd = Math.round((timer - now) / 1000);
     if (timeUntilEnd > 0 && answersArray) {
       timerDiv.classList.remove("hidden");
@@ -217,7 +216,7 @@ function showMessage(status) {
 
 function sendAnswer(answer, id) {
   clearInterval(countDownInterval);
-  let dataToSend = { [id]: answer };
+  const dataToSend = { [id]: answer };
   sendData(dataToSend, "/answers");
   clear();
   showMessage(SUCCESS);
