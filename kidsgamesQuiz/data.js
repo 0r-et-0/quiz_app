@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = 5000;
+let UPDATE_FREQUENCY = [2000, 5000, 30000, 60000];
 const provider = new GoogleAuthProvider();
 
 /* global variables */
@@ -41,6 +41,7 @@ let latestQuestion;
 let checkForResultsInterval;
 let resultByRegion = {};
 let regionFinalData = {};
+let frequencyMode = 0;
 let allRegions = [
   "lausanne",
   "cote",
@@ -61,6 +62,26 @@ let allRegions = [
   "jura",
   "yverdon",
 ];
+let allRegionsClean = {
+  lausanne: "Lausanne",
+  cote: "La Côte",
+  palezieux: "Palézieux",
+  riviera: "Riviera",
+  neuchatel_val_de_ruz: "Neuchâtel - Val-de-Ruz",
+  neuchatel_val_de_travers: "Neuchâtel - Val-de-Travers",
+  chablais: "Chablais",
+  valais: "Valais",
+  morges: "Morges",
+  echallens: "Echallens",
+  fribourg: "Fribourg - La Gruyère",
+  ouest_lausannois: "Ouest-Lausannois",
+  orbe_chavornay: "Orbe-Chavornay",
+  neuchatel_montagnes: "Neuchâtel - Montagnes",
+  neuchatel_littoral: "Neuchâtel - Littoral",
+  broye: "La Broye",
+  jura: "Jura bernois - Jura",
+  yverdon: "Yverdon-les-Bains",
+};
 
 /* Data from DB */
 let dataFromDB;
@@ -70,7 +91,16 @@ const questionHtml = document.getElementById("question");
 const num = document.getElementById("num-of-user");
 const table = document.getElementById("table-results");
 const tableFinal = document.getElementById("table-results-final");
-
+const stopBtn = document.getElementById("stop-btn");
+stopBtn.addEventListener("click", () => {
+  clearInterval(checkForResultsInterval);
+  frequencyMode += 1;
+  stopBtn.innerHTML = UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length];
+  checkForResultsInterval = setIntervalAndExecute(
+    getUsersAnswers,
+    UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length]
+  );
+});
 /* login */
 const loginBtn = document.getElementById("logBtn");
 loginBtn.addEventListener("click", signIn);
@@ -89,7 +119,7 @@ function signIn() {
           clearInterval(checkForResultsInterval);
           checkForResultsInterval = setIntervalAndExecute(
             getUsersAnswers,
-            UPDATE_FREQUENCY
+            UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length]
           );
         } else {
           console.log("No question found in db");
@@ -114,6 +144,7 @@ function removeLoginBtn() {
 }
 
 function getUsersAnswers() {
+  console.log(UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length]);
   if (
     latestQuestion.verifiedAnswer !== undefined &&
     latestQuestion.answers !== undefined &&
@@ -259,7 +290,7 @@ function printTable(results) {
     let obj = results[latestQuestion.id][region];
     if (obj) {
       let cell_1 = row.insertCell(0);
-      cell_1.innerHTML = region;
+      cell_1.innerHTML = allRegionsClean[region];
       cell_1.style.fontWeight = "bolder";
       let cell_2 = row.insertCell(1);
       cell_2.innerHTML = obj.answer;
@@ -307,7 +338,7 @@ function printTableCal(results) {
     /* créer la row */
     let row = tableFinal.insertRow(1);
     let cell_1 = row.insertCell(0);
-    cell_1.innerHTML = region[0];
+    cell_1.innerHTML = allRegionsClean[region[0]];
     cell_1.style.fontWeight = "bolder";
     let cell_2 = row.insertCell(1);
     cell_2.innerHTML = region[1];
