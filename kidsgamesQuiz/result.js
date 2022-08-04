@@ -4,6 +4,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase
 import {
   getAuth,
   signInWithPopup,
+  signInAnonymously,
   GoogleAuthProvider,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
@@ -32,17 +33,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
+let USER;
+let UPDATE_FREQUENCY = 60000;
 const provider = new GoogleAuthProvider();
 /* DOM */
 const map = document.getElementById("map");
 const questionAnswered = document.getElementById("question");
+const responseHtml = document.getElementById("response");
 /* login */
-let loginBtn = document.getElementById("logBtn");
-loginBtn.addEventListener("click", signIn);
+/* let loginBtn = document.getElementById("logBtn");
+loginBtn.addEventListener("click", signIn); */
 
 let resultByRegion = {};
 let latestQuestion;
 let checkForResultsInterval;
+let verifiedAnswerInterval;
 let allRegions = [
   "lausanne",
   "cote",
@@ -63,14 +68,71 @@ let allRegions = [
   "jura",
   "yverdon",
 ];
+let regionFinalData = {};
 
 /* Data from DB */
 let dataFromDB;
 
-function signIn() {
+/* AUTH */
+
+signInAnonymously(auth)
+  .then(() => {
+    // Signed in..
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // ...
+    alert(errorCode, errorMessage);
+  });
+
+/* execute when user is sign in */
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const user = auth.currentUser;
+    USER = user.uid;
+    /* start listen to db changes */
+    onValue(ref(db, "questions"), (snapshot) => {
+      if (snapshot.exists()) {
+        console.log("New results from db...");
+        latestQuestion = snapshot.val();
+        questionAnswered.innerHTML = latestQuestion.question;
+        clearInterval(checkForResultsInterval);
+        resetMapColor();
+        checkForResultsInterval = setIntervalAndExecute(
+          getUsersAnswers,
+          UPDATE_FREQUENCY
+        );
+
+        /* check if timer exist */
+        let timer = latestQuestion.timer;
+        if (timer && typeof timer === "number") {
+          /* delete existing interval if exist */
+          clearInterval(verifiedAnswerInterval);
+          /* calculate the remaining time*/
+          verifiedAnswerInterval = setIntervalAndExecute(checkForTime, 500);
+        }
+      } else {
+        console.log("No question found in db");
+      }
+    });
+  }
+});
+
+function checkForTime() {
+  let timer = latestQuestion.timer;
+  let timeUntilEnd = Math.round((timer - Date.now()) / 1000);
+  console.log(timeUntilEnd);
+  if (timeUntilEnd > 0) {
+    response.innerHTML = "";
+  } else {
+    response.innerHTML = latestQuestion.verifiedAnswer;
+    clearInterval(verifiedAnswerInterval);
+  }
+}
+/* function signIn() {
   signInWithPopup(auth, provider)
     .then((result) => {
-      /* start listen to db changes */
       onValue(ref(db, "questions"), (snapshot) => {
         latestQuestion = snapshot.val();
         questionAnswered.innerHTML = latestQuestion.question;
@@ -85,15 +147,14 @@ function signIn() {
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
     });
-}
+} */
 
-function setupDashboard() {
-  /* remove login btn */
+/* function setupDashboard() {
   const loginBtn = document.getElementById("inputs");
   loginBtn.classList.add("hidden");
   const resultSection = document.getElementById("result");
   resultSection.classList.remove("hidden");
-}
+} */
 
 function getUsersAnswers() {
   if (
@@ -106,8 +167,6 @@ function getUsersAnswers() {
         if (snapshot.exists()) {
           dataFromDB = snapshot.val();
           let numbOfUsers = Object.keys(dataFromDB).length;
-          document.getElementById("numbersOfUser").innerHTML =
-            "nombre de participants: " + numbOfUsers;
           generateResults();
         } else {
           console.log("No data available");
@@ -132,7 +191,6 @@ function generateResults() {
       if (!resultByRegion[region]) {
         resultByRegion[region] = {};
       }
-
       if (userAnswers !== undefined && userAnswers !== null) {
         for (const question in userAnswers) {
           let answers = userAnswers[question];
@@ -162,8 +220,6 @@ function verifyResults() {
   const possiblesAnswers = latestQuestion.answers;
   const verifiedAnswer = latestQuestion.verifiedAnswer;
 
-  let regionFinalAnswers = {};
-
   console.log(
     "%cla question posée est : " + questionTxt,
     "color: white; font-style: italic; background-color: blue;padding: 2px"
@@ -172,20 +228,25 @@ function verifyResults() {
     "%cla bonne réponse est : " + verifiedAnswer,
     "color: white; font-style: italic; background-color: green;padding: 2px"
   );
-  /* check if it's a true question (not the starting sentence) */
+  /* check if it's a true question (not for the starting sentence) */
   if (possiblesAnswers) {
     for (const region in resultByRegion) {
       let AnswersForCurrentQuestion = resultByRegion[region][questionId];
-      let regionBiggestAnswer = { answer: "", count: 0 };
+      let regionAnswerData = {
+        answer: "",
+        count: 0,
+        count_all_players: 0,
+        percent: 0,
+      };
       /* only if region has at least one response */
       if (AnswersForCurrentQuestion) {
         /* browse all answer and find the most answered answer for each region */
         for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
           /* if answer if most answered that the last we update */
-          if (value > regionBiggestAnswer.count) {
-            regionBiggestAnswer.answer = key;
-            regionBiggestAnswer.count = value;
-          } else if (value === regionBiggestAnswer.count) {
+          if (value > regionAnswerData.count) {
+            regionAnswerData.answer = key;
+            regionAnswerData.count = value;
+          } else if (value === regionAnswerData.count) {
             /* if we have a draw between two answer... */
             /*             console.log(
               "%cit's a draw",
@@ -194,11 +255,16 @@ function verifyResults() {
             /* we will take the verified answer if possible */
             if (key === verifiedAnswer) {
               /* console.log("best answer is taken in the draw"); */
-              regionBiggestAnswer.answer = key;
-              regionBiggestAnswer.count = value;
+              regionAnswerData.answer = key;
+              regionAnswerData.count = value;
             }
           }
+          /* we add to the total */
+          regionAnswerData.count_all_players += value;
         }
+
+        regionAnswerData.percent =
+          (regionAnswerData.count * 100) / regionAnswerData.count_all_players;
         /*         console.log(
           "%c" + region + "%c final answer is " + regionBiggestAnswer.answer,
           "color: white; font-style: italic; background-color: green;padding: 2px"
@@ -208,25 +274,38 @@ function verifyResults() {
         console.log("/////");
         */
 
+        if (!(questionId in regionFinalData)) {
+          regionFinalData[questionId] = {};
+        }
+
         //check if answer region is true or false
-        if (regionBiggestAnswer.answer === verifiedAnswer) {
-          regionFinalAnswers[region] = true;
+        if (regionAnswerData.answer === verifiedAnswer) {
+          regionFinalData[questionId][region] = {
+            answer: true,
+            numPlayer: regionAnswerData.count_all_players,
+            percent: regionAnswerData.percent,
+          };
         } else {
-          regionFinalAnswers[region] = false;
+          regionFinalData[questionId][region] = {
+            answer: false,
+            numPlayer: regionAnswerData.count_all_players,
+            percent: regionAnswerData.percent,
+          };
         }
       }
     }
+    /* if region has no key add one and set value to null */
     for (const reg of allRegions) {
-      if (!(reg in regionFinalAnswers)) {
-        regionFinalAnswers[reg] = null;
+      if (!(reg in regionFinalData[questionId])) {
+        regionFinalData[questionId][reg] = null;
       }
     }
     console.log("Réponse des régions");
-    console.table(regionFinalAnswers);
+    console.log(regionFinalData);
 
-    colorTheMap(regionFinalAnswers);
+    colorTheMap(regionFinalData[questionId]);
   } else {
-    console.log("ce n'est pas la question");
+    console.log("Pas de question possée");
   }
   //color the map in grey here
 }
@@ -236,9 +315,11 @@ async function colorTheMap(response) {
     const svgRegion = document.getElementById(region).firstElementChild;
     if (svgRegion) {
       if (response[region]) {
-        svgRegion.style.fill = "#a2c61c";
-      } else if (response[region] === false) {
-        svgRegion.style.fill = "#e10f21";
+        if (response[region].answer) {
+          svgRegion.style.fill = "#a2c61c";
+        } else if (response[region].answer === false) {
+          svgRegion.style.fill = "#e10f21";
+        }
       } else {
         svgRegion.style.fill = "#EDEDED";
       }

@@ -63,17 +63,17 @@ loginBtn.addEventListener("click", signIn);
 
 function createQuestions() {
   const fieldset = document.getElementById("questions");
-  console.log(questionsData);
-  for (const question in questionsData) {
+  console.log(QUESTION_DATA);
+  for (const question in QUESTION_DATA) {
     console.log(question);
     const input = document.createElement("input");
     input.id = question;
     input.type = "radio";
     input.name = "question";
-    input.value = questionsData[question].question;
+    input.value = QUESTION_DATA[question].question;
     const label = document.createElement("label");
     label.setAttribute("for", question);
-    label.innerHTML = questionsData[question].question;
+    label.innerHTML = QUESTION_DATA[question].question;
 
     fieldset.appendChild(input);
     fieldset.appendChild(label);
@@ -81,10 +81,10 @@ function createQuestions() {
 }
 
 function sendQuestion() {
-  console.log(questionsData[selectedQuestion]);
+  console.log(QUESTION_DATA[selectedQuestion]);
 
   timeUntilEnd = Math.round(TIMER / 1000);
-  const currentQuestion = questionsData[selectedQuestion];
+  const currentQuestion = QUESTION_DATA[selectedQuestion];
 
   set(ref(db, "questions"), {
     question: currentQuestion.question,
@@ -94,7 +94,6 @@ function sendQuestion() {
     verifiedAnswer: currentQuestion.verifiedAnswer || null,
   })
     .then(() => {
-      /* alert("question envoyée avec succès"); */
       clearInterval(countDownInterval);
       if (selectedQuestion !== 0) {
         countDownInterval = setIntervalAndExecute(updateCountDown, 1000);

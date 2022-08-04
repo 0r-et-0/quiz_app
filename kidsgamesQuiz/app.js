@@ -92,6 +92,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function IsUserInDB() {
+  console.log(USER);
   console.log("check if user is in db");
   get(ref(db, "users/" + USER))
     .then((snapshot) => {
@@ -152,9 +153,9 @@ function revealQuestion(data) {
   }
   /* check if timer exist */
   if (timer && typeof timer === "number") {
-    console.log(timer);
-    const now = Date.now();
-    timeUntilEnd = Math.round((timer - now) / 1000);
+    /* calculate the remaining time*/
+    timeUntilEnd = Math.round((timer - Date.now()) / 1000);
+    /* if there is time left and question has answers -> show answers btn */
     if (timeUntilEnd > 0 && answersArray) {
       timerDiv.classList.remove("hidden");
       countDownInterval = setIntervalAndExecute(updateCountDown, 1000);

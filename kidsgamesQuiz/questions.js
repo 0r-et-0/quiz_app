@@ -1,6 +1,6 @@
 // si la question n'a pas de answers elle s'affichera comme un message
 
-const questionsData = {
+const QUESTION_DATA = {
   q0: {
     question: "Bienvenue au quiz des kidsgames",
     id: "q0",

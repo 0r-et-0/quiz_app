@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results Details</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="inputs">
+      <section>
+        <h1>Log in to see detailed results</h1>
+        <button id="logBtn">log as admin</button>
+      </section>
+    </div>
+    <div class="hidden" id="dashboard">
+      <h1 id="question">Question</h1>
+      <br />
+      <span>Number of users : </span><span id="num-of-user">0</span>
+      <br />
+      <br />
+      <table id="table-results"></table>
+    </div>
+    <script src="questions.js" defer></script>
+    <script type="module" src="data.js" defer></script>
+  </body>
+</html>
