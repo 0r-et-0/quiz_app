@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = [2000, 5000, 30000, 60000];
+let UPDATE_FREQUENCY = [10000, 2000, 5000, 60000];
 const provider = new GoogleAuthProvider();
 
 /* global variables */
@@ -92,6 +92,7 @@ const num = document.getElementById("num-of-user");
 const table = document.getElementById("table-results");
 const tableFinal = document.getElementById("table-results-final");
 const stopBtn = document.getElementById("stop-btn");
+stopBtn.innerHTML = UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length];
 stopBtn.addEventListener("click", () => {
   clearInterval(checkForResultsInterval);
   frequencyMode += 1;
