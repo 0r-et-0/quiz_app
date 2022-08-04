@@ -34,7 +34,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = 60000;
+let UPDATE_FREQUENCY = 5000;
 const provider = new GoogleAuthProvider();
 /* DOM */
 const map = document.getElementById("map");
@@ -122,7 +122,6 @@ onAuthStateChanged(auth, (user) => {
 function checkForTime() {
   let timer = latestQuestion.timer;
   let timeUntilEnd = Math.round((timer - Date.now()) / 1000);
-  console.log(timeUntilEnd);
   if (timeUntilEnd > 0) {
     response.innerHTML = "";
   } else {
@@ -294,10 +293,13 @@ function verifyResults() {
         }
       }
     }
+    console.log(regionFinalData);
     /* if region has no key add one and set value to null */
     for (const reg of allRegions) {
-      if (!(reg in regionFinalData[questionId])) {
-        regionFinalData[questionId][reg] = null;
+      if (regionFinalData[questionId]) {
+        if (!(reg in regionFinalData[questionId])) {
+          regionFinalData[questionId][reg] = null;
+        }
       }
     }
     console.log("Réponse des régions");
