@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = 60000;
+let UPDATE_FREQUENCY = 5000;
 const provider = new GoogleAuthProvider();
 
 /* global variables */
@@ -69,6 +69,7 @@ let dataFromDB;
 const questionHtml = document.getElementById("question");
 const num = document.getElementById("num-of-user");
 const table = document.getElementById("table-results");
+const tableFinal = document.getElementById("table-results-final");
 
 /* login */
 const loginBtn = document.getElementById("logBtn");
@@ -159,10 +160,10 @@ function generateResults() {
           resultByRegion[region][question][answers] += 1;
         }
       } else {
-        console.log("answer for user " + user + " is undefined !");
+        //console.log("answer for user " + user + " is undefined !");
       }
     } else {
-      console.log("region for user " + user + " is undefined !");
+      //console.log("region for user " + user + " is undefined !");
     }
   }
   console.log(resultByRegion);
@@ -170,13 +171,6 @@ function generateResults() {
 }
 
 function verifyResults() {
-  /* always check for last question */
-  const questionTxt = latestQuestion.question;
-  const questionId = latestQuestion.id;
-  const possiblesAnswers = latestQuestion.answers;
-
-  /* check if it's a true question (not for the starting sentence) */
-
   for (const region in resultByRegion) {
     //console.log("-----------------" + region + "-----------------------");
     for (const q in resultByRegion[region]) {
@@ -190,8 +184,6 @@ function verifyResults() {
       /* only if region has at least one response */
       if (AnswersForCurrentQuestion) {
         /* browse all answer and find the most answered answer for each region */
-        //console.log("Answer for question " + q);
-
         for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
           /* if answer if most answered that the last we update */
           if (value > regionAnswerData.count) {
@@ -208,15 +200,16 @@ function verifyResults() {
           /* we add to the total */
           regionAnswerData.count_all_players += value;
         }
-
-        regionAnswerData.percent =
+        /* adding percentage of the biggest answer */
+        let per =
           (regionAnswerData.count * 100) / regionAnswerData.count_all_players;
+        let rounded_per = Math.round(per);
+        regionAnswerData.percent = rounded_per;
 
         /* if question id does not exist in regionFinalData we add it */
         if (!(q in regionFinalData)) {
           regionFinalData[q] = {};
         }
-
         //check if answer region is true or false
         if (regionAnswerData.answer === QUESTION_DATA[q].verifiedAnswer) {
           regionFinalData[q][region] = {
@@ -242,29 +235,82 @@ function verifyResults() {
       }
     }
   }
-  console.log("Réponse des régions");
+  console.log("Réponses des régions");
   console.log(regionFinalData);
   printTable(regionFinalData);
+  calcTotal(regionFinalData);
 }
 
 function printTable(results) {
   removeAllChildNodes(table);
+  let header = table.insertRow(0);
+  let header_cel = header.insertCell(0);
+  let header_cel_2 = header.insertCell(1);
+  let header_cel_3 = header.insertCell(2);
+  let header_cel_4 = header.insertCell(3);
+  header_cel.innerHTML = "Région";
+  header_cel_2.innerHTML = "Réponse";
+  header_cel_3.innerHTML = "Nbr de participants";
+  header_cel_4.innerHTML = "Pourcentage";
+
   for (const region in results[latestQuestion.id]) {
     /* créer la row */
-    let row = table.insertRow(0);
-    let cel_count = 0;
+    let row = table.insertRow(1);
     let obj = results[latestQuestion.id][region];
     if (obj) {
-      let cell_reg = row.insertCell(cel_count);
-      cell_reg.innerHTML = region;
-      for (const [key, value] of Object.entries(obj)) {
-        console.log(key, value);
-        /* mettre les colonnes */
-        let cell = row.insertCell(cel_count);
-        cell.innerHTML = value;
-        cel_count += 1;
+      let cell_1 = row.insertCell(0);
+      cell_1.innerHTML = region;
+      cell_1.style.fontWeight = "bolder";
+      let cell_2 = row.insertCell(1);
+      cell_2.innerHTML = obj.answer;
+      if (obj.answer) {
+        cell_2.style.backgroundColor = "#4aed88";
+      } else {
+        cell_2.style.backgroundColor = "#eb717d";
+      }
+      let cell_3 = row.insertCell(2);
+      cell_3.innerHTML = obj.numPlayer;
+      let cell_4 = row.insertCell(3);
+      cell_4.innerHTML = obj.percent;
+    }
+  }
+}
+
+function calcTotal(results) {
+  let scoreTotal = {};
+  for (const region of allRegions) {
+    scoreTotal[region] = 0;
+    for (const question in results) {
+      if (results[question][region]) {
+        if (results[question][region].answer === true) {
+          const per = results[question][region].percent;
+          scoreTotal[region] += per;
+        }
       }
     }
+  }
+  printTableCal(scoreTotal);
+}
+
+function printTableCal(results) {
+  removeAllChildNodes(tableFinal);
+  let header = tableFinal.insertRow(0);
+  let header_cel = header.insertCell(0);
+  let header_cel_2 = header.insertCell(1);
+  header_cel.innerHTML = "Région";
+  header_cel_2.innerHTML = "Score";
+
+  let entries = Object.entries(results);
+  let sorted = entries.sort((a, b) => a[1] - b[1]);
+
+  for (const region of sorted) {
+    /* créer la row */
+    let row = tableFinal.insertRow(1);
+    let cell_1 = row.insertCell(0);
+    cell_1.innerHTML = region[0];
+    cell_1.style.fontWeight = "bolder";
+    let cell_2 = row.insertCell(1);
+    cell_2.innerHTML = region[1];
   }
 }
 
