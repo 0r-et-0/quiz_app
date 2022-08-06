@@ -159,6 +159,8 @@ function getUsersAnswers() {
           generateResults();
         } else {
           console.log("No data available");
+          removeAllChildNodes(table);
+          removeAllChildNodes(tableFinal);
         }
       })
       .catch((error) => {
