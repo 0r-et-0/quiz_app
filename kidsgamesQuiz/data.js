@@ -167,7 +167,6 @@ function getUsersAnswers() {
   } else {
     clearInterval(checkForResultsInterval);
     console.log("pas de question");
-    resetMapColor();
   }
 }
 
