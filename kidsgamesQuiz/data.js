@@ -92,6 +92,7 @@ const num = document.getElementById("num-of-user");
 const table = document.getElementById("table-results");
 const tableFinal = document.getElementById("table-results-final");
 const stopBtn = document.getElementById("stop-btn");
+const responseHtml = document.getElementById("response");
 stopBtn.innerHTML = UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length];
 stopBtn.addEventListener("click", () => {
   clearInterval(checkForResultsInterval);
@@ -122,6 +123,15 @@ function signIn() {
             getUsersAnswers,
             UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length]
           );
+
+          /* check if timer exist */
+          let timer = latestQuestion.timer;
+          if (timer && typeof timer === "number") {
+            /* delete existing interval if exist */
+            clearInterval(verifiedAnswerInterval);
+            /* calculate the remaining time*/
+            verifiedAnswerInterval = setIntervalAndExecute(checkForTime, 500);
+          }
         } else {
           console.log("No question found in db");
         }
@@ -134,6 +144,19 @@ function signIn() {
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
     });
+}
+
+function checkForTime() {
+  let timer = latestQuestion.timer;
+  let timeUntilEnd = Math.round((timer - Date.now()) / 1000);
+  if (timeUntilEnd > 0) {
+    responseHtml.innerHTML = "";
+  } else {
+    if (latestQuestion.verifiedAnswer) {
+      responseHtml.innerHTML = latestQuestion.verifiedAnswer;
+    }
+    clearInterval(verifiedAnswerInterval);
+  }
 }
 
 function removeLoginBtn() {
