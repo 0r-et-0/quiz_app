@@ -76,9 +76,13 @@ section {
   align-self: center;
 }
 h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   color: #444;
   margin: 1rem;
+}
+
+#questionResult h1 {
+  font-size: 3rem;
 }
 #timer-span {
   font-size: 4rem;
