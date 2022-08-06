@@ -56,20 +56,13 @@ const QUESTION_DATA = {
   q8: {
     question: "Que représente la mascotte de l’édition 2022 ?",
     id: "q8",
-    answers: ["Monsieur Loyal", "Cheffe d’orchestre", "Clown"],
-    verifiedAnswer: "bleu / rouge / vert / rose / jaune",
+    answers: ["Monsieur Loyal", "Chef d’orchestre", "Clown"],
+    verifiedAnswer: "Chef d’orchestre",
   },
   q9: {
     question: "Comment s’appellent nos deux maîtres de cérémonie ?",
     id: "q9",
     answers: ["Joyce & Alexandre", "Alexandre & Simon", "Emmanuel & Joyce"],
     verifiedAnswer: "Joyce & Alexandre",
-  },
-  q10: {
-    question:
-      "Combien de litre d’eau seront transportées dans la paume de vos mains durant le “Passmoil’ô”?",
-    id: "q10",
-    answers: ["2000 litres", "300 litres", "20 litres"],
-    verifiedAnswer: "bleu / rouge / vert / rose / jaune",
   },
 };
