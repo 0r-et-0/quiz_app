@@ -76,7 +76,7 @@ section {
   align-self: center;
 }
 h1 {
-  font-size: 1.75rem;
+  font-size: 3rem;
   color: #444;
   margin: 1rem;
 }
@@ -148,7 +148,7 @@ span {
   color: blue;
 }
 #questionResult {
-  min-height: 10rem;
+  min-height: 15rem;
 }
 /* spinner */
 .lds-ellipsis {
