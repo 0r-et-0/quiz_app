@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = [10000, 2000, 5000, 60000];
+let UPDATE_FREQUENCY = [2000, 5000, 60000];
 const provider = new GoogleAuthProvider();
 
 /* global variables */
@@ -171,7 +171,6 @@ function removeLoginBtn() {
 }
 
 function getUsersAnswers() {
-  console.log(UPDATE_FREQUENCY[frequencyMode % UPDATE_FREQUENCY.length]);
   if (
     latestQuestion.verifiedAnswer !== undefined &&
     latestQuestion.answers !== undefined &&

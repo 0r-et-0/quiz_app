@@ -43,6 +43,8 @@ const provider = new GoogleAuthProvider();
 /* global */
 let selectedQuestion;
 const sendBtn = document.getElementById("send-question");
+const finalBtnTrue = document.getElementById("final-true");
+const finalBtnFalse = document.getElementById("final-false");
 
 /* event listener */
 sendBtn.addEventListener("click", () => {
@@ -55,6 +57,18 @@ sendBtn.addEventListener("click", () => {
   }
   sendQuestion();
   /* cleanAnswers(); */
+});
+
+finalBtnTrue.addEventListener("click", () => {
+  set(ref(db, "final"), {
+    showScore: true,
+  });
+});
+
+finalBtnFalse.addEventListener("click", () => {
+  set(ref(db, "final"), {
+    showScore: false,
+  });
 });
 
 /* login */
@@ -111,6 +125,9 @@ function signIn() {
       console.log("login succed");
       removeLoginBtn();
       createQuestions();
+      set(ref(db, "final"), {
+        showScore: false,
+      });
       // ...
     })
     .catch((error) => {

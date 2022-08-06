@@ -227,6 +227,15 @@ select:focus {
 
 #response {
   color: white;
+  border-radius: 16px;
+  width: auto;
+  padding: 8px;
+}
+
+#question {
+  color: white;
+  padding: 8px;
+  border-radius: 16px;
 }
 
 table {
@@ -243,4 +252,19 @@ th {
 
 tr:nth-child(even) {
   background-color: #dddddd;
+}
+
+#score {
+  background-color: white;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+}
+
+.region-score {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  font-size: 5rem;
 }
