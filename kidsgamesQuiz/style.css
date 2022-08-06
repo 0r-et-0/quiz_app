@@ -152,7 +152,7 @@ span {
   color: blue;
 }
 #questionResult {
-  min-height: 15rem;
+  min-height: 22rem;
 }
 /* spinner */
 .lds-ellipsis {
