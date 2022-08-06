@@ -42,6 +42,7 @@ let checkForResultsInterval;
 let resultByRegion = {};
 let regionFinalData = {};
 let frequencyMode = 0;
+let verifiedAnswerInterval;
 let allRegions = [
   "lausanne",
   "cote",
@@ -151,9 +152,11 @@ function checkForTime() {
   let timeUntilEnd = Math.round((timer - Date.now()) / 1000);
   if (timeUntilEnd > 0) {
     responseHtml.innerHTML = "";
+    responseHtml.style.backgroundColor = "white";
   } else {
     if (latestQuestion.verifiedAnswer) {
       responseHtml.innerHTML = latestQuestion.verifiedAnswer;
+      responseHtml.style.backgroundColor = "#4c4";
     }
     clearInterval(verifiedAnswerInterval);
   }

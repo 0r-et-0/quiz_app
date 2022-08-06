@@ -13,7 +13,7 @@ const QUESTION_DATA = {
     verifiedAnswer: "2004",
   },
   q2: {
-    question: "Quel sport n’a jamais été joué officiellement aux Kidsgames?",
+    question: "Quel sport n’a jamais été joué officiellement aux Kidsgames ?",
     id: "q2",
     answers: ["Tchoukball", "Kinball", "Basketball", "Poullball"],
     verifiedAnswer: "Basketball",
@@ -41,7 +41,7 @@ const QUESTION_DATA = {
     question: "Quel est le diamètre du ballon de KinBall",
     id: "q6",
     answers: ["132 cm", "112 cm", "122 cm"],
-    verifiedAnswer: "112 cm",
+    verifiedAnswer: "122 cm",
   },
   q7: {
     question: "Quelles couleurs sont sur le logo des KidsGames ?",
