@@ -125,7 +125,9 @@ function checkForTime() {
   if (timeUntilEnd > 0) {
     response.innerHTML = "";
   } else {
-    response.innerHTML = latestQuestion.verifiedAnswer;
+    if (latestQuestion.verifiedAnswer) {
+      response.innerHTML = latestQuestion.verifiedAnswer;
+    }
     clearInterval(verifiedAnswerInterval);
   }
 }
