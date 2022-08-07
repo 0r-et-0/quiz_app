@@ -34,7 +34,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const auth = getAuth(app);
 let USER;
-let UPDATE_FREQUENCY = 50000;
+let UPDATE_FREQUENCY = 3000;
 const provider = new GoogleAuthProvider();
 /* DOM */
 const map = document.getElementById("map");
