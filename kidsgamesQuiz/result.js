@@ -135,6 +135,9 @@ onAuthStateChanged(auth, (user) => {
           clearInterval(verifiedAnswerInterval);
           /* calculate the remaining time*/
           verifiedAnswerInterval = setIntervalAndExecute(checkForTime, 500);
+        } else {
+          response.innerHTML = "";
+          response.style.backgroundColor = "transparent";
         }
       } else {
         console.log("No question found in db");
@@ -145,8 +148,10 @@ onAuthStateChanged(auth, (user) => {
       if (snapshot.exists()) {
         if (snapshot.val().showScore) {
           scoreHtml.classList.remove("hidden");
+          map.classList.add("hidden");
         } else {
           scoreHtml.classList.add("hidden");
+          map.classList.remove("hidden");
         }
       } else {
         console.log("fianl set up");
