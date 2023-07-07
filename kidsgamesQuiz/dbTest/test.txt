@@ -1,1 +1,0 @@
-'chablais', 'echallens', 'fribourg', 'jura', 'broye', 'cote', 'lausanne', 'morges', 'neuchatel_littoral', 'neuchatel_montagnes', 'neuchatel_val_de_ruz', 'neuchatel_val_de_travers', 'orbe_chavornay', 'ouest_lausannois', 'palezieux', 'riviera', 'valais', 'yverdon'

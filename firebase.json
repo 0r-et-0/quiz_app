@@ -1,6 +1,0 @@
-{
-  "hosting": {
-    "public": "kidsgamesQuiz",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-  }
-}
