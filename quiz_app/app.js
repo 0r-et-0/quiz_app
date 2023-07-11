@@ -1,8 +1,4 @@
 /* IMPORT AND CONFIG */
-
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-/* import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js"; */
 import {
   getAuth,
   signInAnonymously,
@@ -16,16 +12,24 @@ import {
   update,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD3ccrB_rquaD6Fs6fgyuvt8W-lMCcBv_Q",
-  authDomain: "kidsgames-quiz.firebaseapp.com",
-  projectId: "kidsgames-quiz",
-  storageBucket: "kidsgames-quiz.appspot.com",
-  messagingSenderId: "371626728077",
-  appId: "1:371626728077:web:5d100065bc868727b760c4",
-  measurementId: "G-20ZE6HZ84D",
-};
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAw5MfHfJTgnYD3osV8XoNrll6n73LBCpo",
+  authDomain: "mariage-cj.firebaseapp.com",
+  databaseURL: "https://mariage-cj-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mariage-cj",
+  storageBucket: "mariage-cj.appspot.com",
+  messagingSenderId: "21886820069",
+  appId: "1:21886820069:web:e094719131e6fc9a5abe0c",
+  measurementId: "G-NS0EMLM3PH"
+};
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 /* const analytics = getAnalytics(app); */
