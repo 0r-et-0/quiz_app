@@ -1,23 +1,16 @@
 /* IMPORT AND CONFIG */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import {
   getDatabase,
   ref,
   set,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAw5MfHfJTgnYD3osV8XoNrll6n73LBCpo",
   authDomain: "mariage-cj.firebaseapp.com",
@@ -38,14 +31,6 @@ let countDownInterval;
 const timerSpan = document.getElementById("timer-span");
 let timeUntilEnd;
 
-/* onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("signed in");
-    const uid = user.uid;
-  } else {
-    console.log("signed out");
-  }
-}); */
 
 const provider = new GoogleAuthProvider();
 /* global */
@@ -116,6 +101,7 @@ function sendQuestion() {
     verifiedAnswer: currentQuestion.verifiedAnswer || null,
   })
     .then(() => {
+      console.log('salut')
       clearInterval(countDownInterval);
       if (selectedQuestion !== 0) {
         countDownInterval = setIntervalAndExecute(updateCountDown, 1000);

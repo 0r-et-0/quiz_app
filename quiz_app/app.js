@@ -1,20 +1,17 @@
-/* IMPORT AND CONFIG */
-import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import {
   getDatabase,
   ref,
   get,
   onValue,
   update,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -30,9 +27,9 @@ const firebaseConfig = {
   appId: "1:21886820069:web:e094719131e6fc9a5abe0c",
   measurementId: "G-NS0EMLM3PH"
 };
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-/* const analytics = getAnalytics(app); */
 const db = getDatabase();
 
 /* REFERENCE */
@@ -87,7 +84,10 @@ onAuthStateChanged(auth, (user) => {
     onValue(ref(db, "questions"), (snapshot) => {
       console.log("getting data from firebase...");
       if (snapshot.exists()) {
+        console.log(snapshot.val)
         revealQuestion(snapshot.val());
+      }else{
+        console.log('no snapshot')
       }
     });
   } else {
