@@ -1,11 +1,12 @@
 /* IMPORT AND CONFIG */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import {
   getAuth,
   signInWithPopup,
   signInAnonymously,
   GoogleAuthProvider,
   onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import {
   getDatabase,
   ref,
@@ -15,16 +16,9 @@ import {
   onValue,
   update,
   remove,
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAw5MfHfJTgnYD3osV8XoNrll6n73LBCpo",
   authDomain: "mariage-cj.firebaseapp.com",
@@ -43,6 +37,7 @@ const auth = getAuth(app);
 let USER;
 let UPDATE_FREQUENCY = 3000;
 const provider = new GoogleAuthProvider();
+
 /* DOM */
 const map = document.getElementById("map");
 const questionAnswered = document.getElementById("question");
@@ -53,58 +48,51 @@ const scoreHtml = document.getElementById("score");
 /* let loginBtn = document.getElementById("logBtn");
 loginBtn.addEventListener("click", signIn); */
 
-let resultByRegion = {};
+let resultByTable = {};
 let latestQuestion;
 let checkForResultsInterval;
 let verifiedAnswerInterval;
-let allRegions = [
-  "lausanne",
-  "cote",
-  "palezieux",
-  "riviera",
-  "neuchatel_val_de_ruz",
-  "neuchatel_val_de_travers",
-  "chablais",
-  "valais",
-  "morges",
-  "echallens",
-  "fribourg",
-  "ouest_lausannois",
-  "orbe_chavornay",
-  "neuchatel_montagnes",
-  "neuchatel_littoral",
-  "broye",
-  "jura",
-  "yverdon",
+let allTables = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
 ];
-let allRegionsClean = {
-  lausanne: "Lausanne",
-  cote: "La Côte",
-  palezieux: "Palézieux",
-  riviera: "Riviera",
-  neuchatel_val_de_ruz: "Neuchâtel - Val-de-Ruz",
-  neuchatel_val_de_travers: "Neuchâtel - Val-de-Travers",
-  chablais: "Chablais",
-  valais: "Valais",
-  morges: "Morges",
-  echallens: "Echallens",
-  fribourg: "Fribourg - La Gruyère",
-  ouest_lausannois: "Ouest-Lausannois",
-  orbe_chavornay: "Orbe-Chavornay",
-  neuchatel_montagnes: "Neuchâtel - Montagnes",
-  neuchatel_littoral: "Neuchâtel - Littoral",
-  broye: "La Broye",
-  jura: "Jura bernois - Jura",
-  yverdon: "Yverdon-les-Bains",
+let allTablesClean = {
+  a: "a",
+  b: "b",
+  c: "c",
+  d: "d",
+  e: "e",
+  f: "f",
+  g: "g",
+  h: "h",
+  i: "i",
+  j: "j",
+  k: "k",
+  l: "l",
+  m: "m",
+  n: "n",
+  o: "o",
 };
-let regionFinalData = {};
+let tableFinalData = {};
 let finalScoreSorted = [];
 
 /* Data from DB */
 let dataFromDB;
 
 /* AUTH */
-
 signInAnonymously(auth)
   .then(() => {
     // Signed in..
@@ -181,31 +169,6 @@ function checkForTime() {
     clearInterval(verifiedAnswerInterval);
   }
 }
-/* function signIn() {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      onValue(ref(db, "questions"), (snapshot) => {
-        latestQuestion = snapshot.val();
-        questionAnswered.innerHTML = latestQuestion.question;
-        clearInterval(checkForResultsInterval);
-        resetMapColor();
-        checkForResultsInterval = setIntervalAndExecute(getUsersAnswers, 5000);
-      });
-      setupDashboard();
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
-    });
-} */
-
-/* function setupDashboard() {
-  const loginBtn = document.getElementById("inputs");
-  loginBtn.classList.add("hidden");
-  const resultSection = document.getElementById("result");
-  resultSection.classList.remove("hidden");
-} */
 
 function getUsersAnswers() {
   if (
@@ -234,116 +197,117 @@ function getUsersAnswers() {
 }
 
 function generateResults() {
-  resultByRegion = {};
+  resultByTable = {};
   for (const user in dataFromDB) {
-    let region = dataFromDB[user].region;
+    let table = dataFromDB[user].table;
     let userAnswers = dataFromDB[user].answers;
-    if (region !== undefined && region !== null) {
-      if (!resultByRegion[region]) {
-        resultByRegion[region] = {};
+    if (table !== undefined && table !== null) {
+      if (!resultByTable[table]) {
+        resultByTable[table] = {};
       }
       if (userAnswers !== undefined && userAnswers !== null) {
         for (const question in userAnswers) {
           let answers = userAnswers[question];
-          if (!resultByRegion[region][question]) {
-            resultByRegion[region][question] = {};
+          if (!resultByTable[table][question]) {
+            resultByTable[table][question] = {};
           }
-          if (!resultByRegion[region][question][answers]) {
-            resultByRegion[region][question][answers] = 0;
+          if (!resultByTable[table][question][answers]) {
+            resultByTable[table][question][answers] = 0;
           }
-          resultByRegion[region][question][answers] += 1;
+          resultByTable[table][question][answers] += 1;
         }
       } else {
         //console.log("answer for user " + user + " is undefined !");
       }
     } else {
-      //console.log("region for user " + user + " is undefined !");
+      //console.log("table for user " + user + " is undefined !");
     }
   }
-  console.log(resultByRegion);
+  console.log(resultByTable);
   verifyResults();
 }
 
+
 function verifyResults() {
-  for (const region in resultByRegion) {
-    //console.log("-----------------" + region + "-----------------------");
-    for (const q in resultByRegion[region]) {
-      let AnswersForCurrentQuestion = resultByRegion[region][q];
-      let regionAnswerData = {
+  for (const table in resultByTable) {
+    //console.log("-----------------" + table + "-----------------------");
+    for (const q in resultByTable[table]) {
+      let AnswersForCurrentQuestion = resultByTable[table][q];
+      let tableAnswerData = {
         answer: "",
         count: 0,
         count_all_players: 0,
         percent: 0,
       };
-      /* only if region has at least one response */
+      /* only if table has at least one response */
       if (AnswersForCurrentQuestion) {
-        /* browse all answer and find the most answered answer for each region */
+        /* browse all answer and find the most answered answer for each table */
         for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
           /* if answer if most answered that the last we update */
-          if (value > regionAnswerData.count) {
-            regionAnswerData.answer = key;
-            regionAnswerData.count = value;
-          } else if (value === regionAnswerData.count) {
+          if (value > tableAnswerData.count) {
+            tableAnswerData.answer = key;
+            tableAnswerData.count = value;
+          } else if (value === tableAnswerData.count) {
             /* draw */
             if (key === QUESTION_DATA[q].verifiedAnswer) {
               /* console.log("best answer is taken in the draw"); */
-              regionAnswerData.answer = key;
-              regionAnswerData.count = value;
+              tableAnswerData.answer = key;
+              tableAnswerData.count = value;
             }
           }
           /* we add to the total */
-          regionAnswerData.count_all_players += value;
+          tableAnswerData.count_all_players += value;
         }
         /* adding percentage of the biggest answer */
         let per =
-          (regionAnswerData.count * 100) / regionAnswerData.count_all_players;
+          (tableAnswerData.count * 100) / tableAnswerData.count_all_players;
         let rounded_per = Math.round(per);
-        regionAnswerData.percent = rounded_per;
+        tableAnswerData.percent = rounded_per;
 
-        /* if question id does not exist in regionFinalData we add it */
-        if (!(q in regionFinalData)) {
-          regionFinalData[q] = {};
+        /* if question id does not exist in tableFinalData we add it */
+        if (!(q in tableFinalData)) {
+          tableFinalData[q] = {};
         }
-        //check if answer region is true or false
-        if (regionAnswerData.answer === QUESTION_DATA[q].verifiedAnswer) {
-          regionFinalData[q][region] = {
+        //check if answer table is true or false
+        if (tableAnswerData.answer === QUESTION_DATA[q].verifiedAnswer) {
+          tableFinalData[q][table] = {
             answer: true,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         } else {
-          regionFinalData[q][region] = {
+          tableFinalData[q][table] = {
             answer: false,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         }
       }
     }
   }
-  /* if region has no key add one and set value to null */
-  for (const reg of allRegions) {
-    for (const q_id in regionFinalData) {
-      if (!(reg in regionFinalData[q_id])) {
-        regionFinalData[q_id][reg] = null;
+  /* if table has no key add one and set value to null */
+  for (const reg of allTables) {
+    for (const q_id in tableFinalData) {
+      if (!(reg in tableFinalData[q_id])) {
+        tableFinalData[q_id][reg] = null;
       }
     }
   }
   console.log("Réponses des régions");
-  console.log(regionFinalData);
-  colorTheMap(regionFinalData[latestQuestion.id]);
-  calcTotal(regionFinalData);
+  console.log(tableFinalData);
+  colorTheMap(tableFinalData[latestQuestion.id]);
+  calcTotal(tableFinalData);
 }
 
 function calcTotal(results) {
   let scoreTotal = {};
-  for (const region of allRegions) {
-    scoreTotal[region] = 0;
+  for (const table of allTables) {
+    scoreTotal[table] = 0;
     for (const question in results) {
-      if (results[question][region]) {
-        if (results[question][region].answer === true) {
-          const per = results[question][region].percent;
-          scoreTotal[region] += per;
+      if (results[question][table]) {
+        if (results[question][table].answer === true) {
+          const per = results[question][table].percent;
+          scoreTotal[table] += per;
         }
       }
     }
@@ -353,16 +317,16 @@ function calcTotal(results) {
   finalScoreSorted = entries.sort((a, b) => b[1] - a[1]);
   console.log(finalScoreSorted);
   let winner = document.createElement("h1");
-  winner.innerHTML = allRegionsClean[finalScoreSorted[0][0]];
-  winner.classList.add("region-score");
+  winner.innerHTML = allTablesClean[finalScoreSorted[0][0]];
+  winner.classList.add("table-score");
   winner.style.color = "#b20067";
   let second = document.createElement("h1");
-  second.innerHTML = allRegionsClean[finalScoreSorted[1][0]];
-  second.classList.add("region-score");
+  second.innerHTML = allTablesClean[finalScoreSorted[1][0]];
+  second.classList.add("table-score");
   second.style.color = "#0088c6";
   let third = document.createElement("h1");
-  third.innerHTML = allRegionsClean[finalScoreSorted[2][0]];
-  third.classList.add("region-score");
+  third.innerHTML = allTablesClean[finalScoreSorted[2][0]];
+  third.classList.add("table-score");
   third.style.color = "#d5091c";
   scoreHtml.appendChild(winner);
   scoreHtml.appendChild(second);
@@ -386,23 +350,23 @@ function verifyResults_old() {
   );
   /* check if it's a true question (not for the starting sentence) */
   if (possiblesAnswers) {
-    for (const region in resultByRegion) {
-      let AnswersForCurrentQuestion = resultByRegion[region][questionId];
-      let regionAnswerData = {
+    for (const table in resultByTable) {
+      let AnswersForCurrentQuestion = resultByTable[table][questionId];
+      let tableAnswerData = {
         answer: "",
         count: 0,
         count_all_players: 0,
         percent: 0,
       };
-      /* only if region has at least one response */
+      /* only if table has at least one response */
       if (AnswersForCurrentQuestion) {
-        /* browse all answer and find the most answered answer for each region */
+        /* browse all answer and find the most answered answer for each table */
         for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
           /* if answer if most answered that the last we update */
-          if (value > regionAnswerData.count) {
-            regionAnswerData.answer = key;
-            regionAnswerData.count = value;
-          } else if (value === regionAnswerData.count) {
+          if (value > tableAnswerData.count) {
+            tableAnswerData.answer = key;
+            tableAnswerData.count = value;
+          } else if (value === tableAnswerData.count) {
             /* if we have a draw between two answer... */
             /*             console.log(
               "%cit's a draw",
@@ -411,18 +375,18 @@ function verifyResults_old() {
             /* we will take the verified answer if possible */
             if (key === verifiedAnswer) {
               /* console.log("best answer is taken in the draw"); */
-              regionAnswerData.answer = key;
-              regionAnswerData.count = value;
+              tableAnswerData.answer = key;
+              tableAnswerData.count = value;
             }
           }
           /* we add to the total */
-          regionAnswerData.count_all_players += value;
+          tableAnswerData.count_all_players += value;
         }
 
-        regionAnswerData.percent =
-          (regionAnswerData.count * 100) / regionAnswerData.count_all_players;
+        tableAnswerData.percent =
+          (tableAnswerData.count * 100) / tableAnswerData.count_all_players;
         /*         console.log(
-          "%c" + region + "%c final answer is " + regionBiggestAnswer.answer,
+          "%c" + table + "%c final answer is " + tableBiggestAnswer.answer,
           "color: white; font-style: italic; background-color: green;padding: 2px"
         );
         console.log("detailed answers :");
@@ -430,39 +394,39 @@ function verifyResults_old() {
         console.log("/////");
         */
 
-        if (!(questionId in regionFinalData)) {
-          regionFinalData[questionId] = {};
+        if (!(questionId in tableFinalData)) {
+          tableFinalData[questionId] = {};
         }
 
-        //check if answer region is true or false
-        if (regionAnswerData.answer === verifiedAnswer) {
-          regionFinalData[questionId][region] = {
+        //check if answer table is true or false
+        if (tableAnswerData.answer === verifiedAnswer) {
+          tableFinalData[questionId][table] = {
             answer: true,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         } else {
-          regionFinalData[questionId][region] = {
+          tableFinalData[questionId][table] = {
             answer: false,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         }
       }
     }
-    console.log(regionFinalData);
-    /* if region has no key add one and set value to null */
-    for (const reg of allRegions) {
-      if (regionFinalData[questionId]) {
-        if (!(reg in regionFinalData[questionId])) {
-          regionFinalData[questionId][reg] = null;
+    console.log(tableFinalData);
+    /* if table has no key add one and set value to null */
+    for (const reg of allTables) {
+      if (tableFinalData[questionId]) {
+        if (!(reg in tableFinalData[questionId])) {
+          tableFinalData[questionId][reg] = null;
         }
       }
     }
     console.log("Réponse des régions");
-    console.log(regionFinalData);
+    console.log(tableFinalData);
 
-    colorTheMap(regionFinalData[questionId]);
+    colorTheMap(tableFinalData[questionId]);
   } else {
     console.log("Pas de question possée");
   }
@@ -470,29 +434,32 @@ function verifyResults_old() {
 }
 
 async function colorTheMap(response) {
-  for (const region in response) {
-    const svgRegion = document.getElementById(region).firstElementChild;
-    if (svgRegion) {
-      if (response[region]) {
-        if (response[region].answer) {
-          svgRegion.style.fill = "#a2c61c";
-        } else if (response[region].answer === false) {
-          svgRegion.style.fill = "#e10f21";
+  console.log(response)
+  for (const table in response) {
+    const svgTable = document.getElementById(table).firstElementChild;
+    if (svgTable) {
+      if (response[table]) {
+        if (response[table].answer) {
+          svgTable.style.fill = "#a2c61c";
+        } else if (response[table].answer === false) {
+          svgTable.style.fill = "#e10f21";
         }
       } else {
-        svgRegion.style.fill = "#EDEDED";
+        svgTable.style.fill = "#EDEDED";
       }
     }
-    /* fake a delay when painting the regions */
+    /* fake a delay when painting the tables */
     await timer(50);
   }
 }
 
 function resetMapColor() {
-  for (const region in resultByRegion) {
-    const svgRegion = document.getElementById(region).firstElementChild;
-    if (svgRegion) {
-      svgRegion.style.fill = "#EDEDED";
+
+  for (const table in resultByTable) {
+
+    const svgTable = document.getElementById(table).firstElementChild;
+    if (svgTable) {
+      svgTable.style.fill = "#EDEDED";
     }
   }
 }

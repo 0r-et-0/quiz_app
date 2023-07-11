@@ -38,17 +38,17 @@ const timerDiv = document.getElementById("timer");
 const answerBtn = document.getElementById("answersBtn");
 const timerSpan = document.getElementById("timer-span");
 const spinner = document.getElementById("spinner");
-const regionInput = document.getElementById("Region");
-const region = document.getElementById("region");
+const tableInput = document.getElementById("Table");
+const table = document.getElementById("table");
 const questions = document.getElementById("questions-to-show");
 const inputs = document.getElementById("inputs");
-const SendRegionBtn = document.getElementById("sendRegion");
-SendRegionBtn.addEventListener("click", storeRegion);
+const SendTableBtn = document.getElementById("sendTable");
+SendTableBtn.addEventListener("click", storeTable);
 
 /* variables */
 let countDownInterval;
 let timeUntilEnd;
-let USER, REGION;
+let USER, TABLE;
 const TOO_LATE = "TOO_LATE";
 const WAITING = "WAITING";
 const SUCCESS = "SUCCESS";
@@ -74,68 +74,71 @@ signInAnonymously(auth)
     alert(errorCode, errorMessage);
   });
 
-/* execute when user is sign in */
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    const user = auth.currentUser;
-    USER = user.uid;
-    IsUserInDB();
-    /* start listen to db changes */
-    onValue(ref(db, "questions"), (snapshot) => {
-      console.log("getting data from firebase...");
-      if (snapshot.exists()) {
-        console.log(snapshot.val)
-        revealQuestion(snapshot.val());
-      }else{
-        console.log('no snapshot')
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      USER = user.uid;
+      try {
+        await IsUserInDB();
+        /* start listening to db changes */
+        onValue(ref(db, "questions"), (snapshot) => {
+          console.log("getting data from Firebase...");
+          if (snapshot.exists()) {
+            console.log(snapshot.val());
+            revealQuestion(snapshot.val());
+          } else {
+            console.log("no snapshot");
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        // Handle the error appropriately
       }
-    });
-  } else {
-    // User is signed out
-  }
-});
+    } else {
+      // User is signed out
+    }
+  });
 
-function IsUserInDB() {
-  console.log(USER);
-  console.log("check if user is in db");
-  get(ref(db, "users/" + USER))
-    .then((snapshot) => {
+  async function IsUserInDB() {
+    console.log(USER);
+    console.log("check if user is in db");
+    try {
+      const snapshot = await get(ref(db, "users/" + USER));
       if (snapshot.exists()) {
         console.log("user is already registered in db");
-        if (snapshot.val().region) {
-          REGION = snapshot.val().region;
+        if (snapshot.val().table) {
+          TABLE = snapshot.val().table;
           showQuestions();
         } else {
-          console.log("user already registered in db but has no region");
-          showRegion();
+          console.log("user already registered in db but has no table");
+          showTable();
         }
       } else {
         console.log("user is not already registered in db");
-        showRegion();
+        showTable();
       }
-      //clear spinner
+      // Clear spinner
       spinner.classList.add("hidden");
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error(error);
-    });
-}
+      throw error;
+    }
+  }
 
 /* INSERT DATA */
-function storeRegion() {
-  REGION = regionInput.value;
-  sendData({ region: REGION }, "");
+function storeTable() {
+  TABLE = tableInput.value;
+  sendData({ table: TABLE }, "");
   showQuestions();
 }
 
-function showRegion() {
-  region.classList.remove("hidden");
-  region.classList.add("flex");
+function showTable() {
+  table.classList.remove("hidden");
+  table.classList.add("flex");
 }
 
 function showQuestions() {
-  region.classList.add("hidden");
-  region.classList.remove("flex");
+  table.classList.add("hidden");
+  table.classList.remove("flex");
   questions.classList.remove("hidden");
   inputs.classList.remove("hidden");
   inputs.classList.add("flex");
@@ -239,21 +242,6 @@ function sendData(dataToSend, path) {
     });
 }
 
-/* function getData() {
-  get(child(ref(db), "questions"))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        console.log(snapshot.val());
-        revealQuestion(snapshot.val());
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-} */
-
 function updateCountDown() {
   console.log("update countdown");
   timerSpan.innerHTML = secondsToMin(timeUntilEnd);
@@ -268,7 +256,6 @@ function updateCountDown() {
 }
 
 /* UTILS */
-
 function secondsToMin(s) {
   return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
 }

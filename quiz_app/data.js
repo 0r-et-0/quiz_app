@@ -45,11 +45,11 @@ const provider = new GoogleAuthProvider();
 /* global variables */
 let latestQuestion;
 let checkForResultsInterval;
-let resultByRegion = {};
-let regionFinalData = {};
+let resultByTable = {};
+let tableFinalData = {};
 let frequencyMode = 0;
 let verifiedAnswerInterval;
-let allRegions = [
+let allTables = [
   "lausanne",
   "cote",
   "palezieux",
@@ -69,7 +69,7 @@ let allRegions = [
   "jura",
   "yverdon",
 ];
-let allRegionsClean = {
+let allTablesClean = {
   lausanne: "Lausanne",
   cote: "La Côte",
   palezieux: "Palézieux",
@@ -202,105 +202,105 @@ function getUsersAnswers() {
 }
 
 function generateResults() {
-  resultByRegion = {};
+  resultByTable = {};
   for (const user in dataFromDB) {
-    let region = dataFromDB[user].region;
+    let table = dataFromDB[user].table;
     let userAnswers = dataFromDB[user].answers;
-    if (region !== undefined && region !== null) {
-      if (!resultByRegion[region]) {
-        resultByRegion[region] = {};
+    if (table !== undefined && table !== null) {
+      if (!resultByTable[table]) {
+        resultByTable[table] = {};
       }
       if (userAnswers !== undefined && userAnswers !== null) {
         for (const question in userAnswers) {
           let answers = userAnswers[question];
-          if (!resultByRegion[region][question]) {
-            resultByRegion[region][question] = {};
+          if (!resultByTable[table][question]) {
+            resultByTable[table][question] = {};
           }
-          if (!resultByRegion[region][question][answers]) {
-            resultByRegion[region][question][answers] = 0;
+          if (!resultByTable[table][question][answers]) {
+            resultByTable[table][question][answers] = 0;
           }
-          resultByRegion[region][question][answers] += 1;
+          resultByTable[table][question][answers] += 1;
         }
       } else {
         //console.log("answer for user " + user + " is undefined !");
       }
     } else {
-      //console.log("region for user " + user + " is undefined !");
+      //console.log("table for user " + user + " is undefined !");
     }
   }
-  console.log(resultByRegion);
+  console.log(resultByTable);
   verifyResults();
 }
 
 function verifyResults() {
-  for (const region in resultByRegion) {
-    //console.log("-----------------" + region + "-----------------------");
-    for (const q in resultByRegion[region]) {
-      let AnswersForCurrentQuestion = resultByRegion[region][q];
-      let regionAnswerData = {
+  for (const table in resultByTable) {
+    //console.log("-----------------" + table + "-----------------------");
+    for (const q in resultByTable[table]) {
+      let AnswersForCurrentQuestion = resultByTable[table][q];
+      let tableAnswerData = {
         answer: "",
         count: 0,
         count_all_players: 0,
         percent: 0,
       };
-      /* only if region has at least one response */
+      /* only if table has at least one response */
       if (AnswersForCurrentQuestion) {
-        /* browse all answer and find the most answered answer for each region */
+        /* browse all answer and find the most answered answer for each table */
         for (const [key, value] of Object.entries(AnswersForCurrentQuestion)) {
           /* if answer if most answered that the last we update */
-          if (value > regionAnswerData.count) {
-            regionAnswerData.answer = key;
-            regionAnswerData.count = value;
-          } else if (value === regionAnswerData.count) {
+          if (value > tableAnswerData.count) {
+            tableAnswerData.answer = key;
+            tableAnswerData.count = value;
+          } else if (value === tableAnswerData.count) {
             /* draw */
             if (key === QUESTION_DATA[q].verifiedAnswer) {
               /* console.log("best answer is taken in the draw"); */
-              regionAnswerData.answer = key;
-              regionAnswerData.count = value;
+              tableAnswerData.answer = key;
+              tableAnswerData.count = value;
             }
           }
           /* we add to the total */
-          regionAnswerData.count_all_players += value;
+          tableAnswerData.count_all_players += value;
         }
         /* adding percentage of the biggest answer */
         let per =
-          (regionAnswerData.count * 100) / regionAnswerData.count_all_players;
+          (tableAnswerData.count * 100) / tableAnswerData.count_all_players;
         let rounded_per = Math.round(per);
-        regionAnswerData.percent = rounded_per;
+        tableAnswerData.percent = rounded_per;
 
-        /* if question id does not exist in regionFinalData we add it */
-        if (!(q in regionFinalData)) {
-          regionFinalData[q] = {};
+        /* if question id does not exist in tableFinalData we add it */
+        if (!(q in tableFinalData)) {
+          tableFinalData[q] = {};
         }
-        //check if answer region is true or false
-        if (regionAnswerData.answer === QUESTION_DATA[q].verifiedAnswer) {
-          regionFinalData[q][region] = {
+        //check if answer table is true or false
+        if (tableAnswerData.answer === QUESTION_DATA[q].verifiedAnswer) {
+          tableFinalData[q][table] = {
             answer: true,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         } else {
-          regionFinalData[q][region] = {
+          tableFinalData[q][table] = {
             answer: false,
-            numPlayer: regionAnswerData.count_all_players,
-            percent: regionAnswerData.percent,
+            numPlayer: tableAnswerData.count_all_players,
+            percent: tableAnswerData.percent,
           };
         }
       }
     }
   }
-  /* if region has no key add one and set value to null */
-  for (const reg of allRegions) {
-    for (const q_id in regionFinalData) {
-      if (!(reg in regionFinalData[q_id])) {
-        regionFinalData[q_id][reg] = null;
+  /* if table has no key add one and set value to null */
+  for (const reg of allTables) {
+    for (const q_id in tableFinalData) {
+      if (!(reg in tableFinalData[q_id])) {
+        tableFinalData[q_id][reg] = null;
       }
     }
   }
   console.log("Réponses des régions");
-  console.log(regionFinalData);
-  printTable(regionFinalData);
-  calcTotal(regionFinalData);
+  console.log(tableFinalData);
+  printTable(tableFinalData);
+  calcTotal(tableFinalData);
 }
 
 function printTable(results) {
@@ -315,13 +315,13 @@ function printTable(results) {
   header_cel_3.innerHTML = "Nbr de participants";
   header_cel_4.innerHTML = "Pourcentage";
 
-  for (const region in results[latestQuestion.id]) {
+  for (const table in results[latestQuestion.id]) {
     /* créer la row */
     let row = table.insertRow(1);
-    let obj = results[latestQuestion.id][region];
+    let obj = results[latestQuestion.id][table];
     if (obj) {
       let cell_1 = row.insertCell(0);
-      cell_1.innerHTML = allRegionsClean[region];
+      cell_1.innerHTML = allTablesClean[table];
       cell_1.style.fontWeight = "bolder";
       let cell_2 = row.insertCell(1);
       cell_2.innerHTML = obj.answer;
@@ -340,13 +340,13 @@ function printTable(results) {
 
 function calcTotal(results) {
   let scoreTotal = {};
-  for (const region of allRegions) {
-    scoreTotal[region] = 0;
+  for (const table of allTables) {
+    scoreTotal[table] = 0;
     for (const question in results) {
-      if (results[question][region]) {
-        if (results[question][region].answer === true) {
-          const per = results[question][region].percent;
-          scoreTotal[region] += per;
+      if (results[question][table]) {
+        if (results[question][table].answer === true) {
+          const per = results[question][table].percent;
+          scoreTotal[table] += per;
         }
       }
     }
@@ -365,14 +365,14 @@ function printTableCal(results) {
   let entries = Object.entries(results);
   let sorted = entries.sort((a, b) => a[1] - b[1]);
 
-  for (const region of sorted) {
+  for (const table of sorted) {
     /* créer la row */
     let row = tableFinal.insertRow(1);
     let cell_1 = row.insertCell(0);
-    cell_1.innerHTML = allRegionsClean[region[0]];
+    cell_1.innerHTML = allTablesClean[table[0]];
     cell_1.style.fontWeight = "bolder";
     let cell_2 = row.insertCell(1);
-    cell_2.innerHTML = region[1];
+    cell_2.innerHTML = table[1];
   }
 }
 

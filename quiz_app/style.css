@@ -63,15 +63,15 @@ section {
 #inputs {
   flex-direction: column;
 }
-#region {
+#table {
   flex-direction: column;
 }
-.select-region {
+.select-table {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.select-region select {
+.select-table select {
   width: fit-content;
   align-self: center;
 }
@@ -261,7 +261,7 @@ tr:nth-child(even) {
   max-width: 100vw;
 }
 
-.region-score {
+.table-score {
   margin-top: 2rem;
   margin-bottom: 2rem;
   font-size: 5rem;
